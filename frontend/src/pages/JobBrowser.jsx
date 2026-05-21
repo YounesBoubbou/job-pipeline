@@ -10,39 +10,13 @@ import { useState, useEffect, useMemo } from 'react'
 import { useTracker } from '../context/TrackerContext.jsx'
 import JobCard from '../components/JobCard.jsx'
 import FilterBar from '../components/FilterBar.jsx'
-
-// ── Filter config ──────────────────────────────────────────────────────────────
-
-export const DEFAULT_FILTERS = {
-  roles:      [],     // [] = show all; otherwise show jobs matching ANY selected role
-  seniority:  true,   // ON  = filter OUT senior/lead/etc.
-  language:   true,   // ON  = filter OUT listings that require Dutch
-  indSponsor: false,  // OFF = show all; ON = show IND-sponsor jobs only
-  education:  false,  // OFF = show all; ON = show only MSc-friendly listings
-}
-
-// Keywords that disqualify a listing under the seniority filter
-const SENIORITY_EXCLUDE = [
-  'senior', 'lead', 'principal', 'staff', 'head of',
-  'manager', 'director', '5+ years', '7+ years', '10+ years',
-]
-
-// Keywords that disqualify a listing under the language filter
-const DUTCH_EXCLUDE = [
-  'dutch', 'nederlands', 'fluent in dutch', 'native dutch',
-]
-
-// Keywords that qualify a listing under the education filter
-const EDU_INCLUDE = ['master', 'msc', 'm.sc']
-
-// Role → keyword mapping (checked against title + description_snippet)
-export const ROLE_MAP = {
-  'AI Engineer':       ['ai engineer', 'artificial intelligence engineer'],
-  'Software Engineer': ['software engineer'],
-  'Data Scientist':    ['data scientist'],
-  'Data Engineer':     ['data engineer'],
-  'ML Engineer':       ['ml engineer', 'machine learning engineer'],
-}
+import {
+  DEFAULT_FILTERS,
+  ROLE_MAP,
+  SENIORITY_EXCLUDE,
+  DUTCH_EXCLUDE,
+  EDU_INCLUDE,
+} from '../constants/filters.js'
 
 // ── Filter logic ───────────────────────────────────────────────────────────────
 

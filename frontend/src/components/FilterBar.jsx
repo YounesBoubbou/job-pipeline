@@ -2,7 +2,7 @@
  * FilterBar — sticky left sidebar with all 5 filter controls.
  */
 
-import { DEFAULT_FILTERS, ROLE_MAP } from '../pages/JobBrowser.jsx'
+import { DEFAULT_FILTERS, ROLE_MAP } from '../constants/filters.js'
 
 const ROLES = Object.keys(ROLE_MAP)
 
