@@ -34,20 +34,12 @@ COMPANY_PAGES = [
         "keyword_in_url": "booking",
     },
     {
-        "name": "RIPE NCC",
-        "url": "https://www.ripe.net/about-us/vacancies/",
-        "keyword_in_url": "ripe",
-    },
-    {
         "name": "SURF",
-        "url": "https://www.surf.nl/en/about-surf/working-at-surf",
+        "url": "https://werkenbij.surf.nl",
         "keyword_in_url": "surf",
     },
-    {
-        "name": "Catawiki",
-        "url": "https://catawiki.com/jobs",
-        "keyword_in_url": "catawiki",
-    },
+    # Note: Catawiki, Adyen, TomTom are fetched via Greenhouse API
+    # in scrapers/company_pages.py — no need to list them here.
 ]
 
 # ── Google Sheets output ──────────────────────

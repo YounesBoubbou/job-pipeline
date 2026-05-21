@@ -1,32 +1,50 @@
 """
 ind_checker.py — Cross-reference companies against the IND public sponsor register.
-The register is downloaded once and cached locally.
+
+The register is scraped from the IND public web page on first run and cached
+locally in data/ind_sponsors.csv. Delete that file to force a refresh.
+
+Source: https://ind.nl/en/public-register-recognised-sponsors/public-register-work
 """
 
 import os
 import requests
 import pandas as pd
-from config import IND_REGISTER_PATH, IND_REGISTER_URL
+from bs4 import BeautifulSoup
+from config import IND_REGISTER_PATH
+
+IND_REGISTER_WEB_URL = (
+    "https://ind.nl/en/public-register-recognised-sponsors/public-register-work"
+)
 
 
 def _download_register():
-    """Download the IND Excel register and convert to a simple CSV."""
-    print("  Downloading IND sponsor register...")
+    """Scrape the IND sponsor table from their public web page and cache as CSV."""
+    print("  Downloading IND sponsor register (web page)...")
     headers = {"User-Agent": "Mozilla/5.0 (compatible; job-pipeline/1.0)"}
     try:
-        r = requests.get(IND_REGISTER_URL, headers=headers, timeout=30)
+        r = requests.get(IND_REGISTER_WEB_URL, headers=headers, timeout=30)
         r.raise_for_status()
-        xlsx_path = IND_REGISTER_PATH.replace(".csv", ".xlsx")
+        soup = BeautifulSoup(r.text, "html.parser")
+
+        # Company names are in <th scope="row"> elements (KvK numbers are in <td>).
+        names = [
+            th.get_text(strip=True).lower()
+            for th in soup.select("table tr th[scope='row']")
+            if th.get_text(strip=True)
+        ]
+
+        if not names:
+            print("  Warning: IND register table was empty — sponsor check will be skipped.")
+            return []
+
         os.makedirs(os.path.dirname(IND_REGISTER_PATH), exist_ok=True)
-        with open(xlsx_path, "wb") as f:
-            f.write(r.content)
-        df = pd.read_excel(xlsx_path, header=None)
-        # Flatten all cells into a single column of company names
-        names = df.values.flatten()
-        names = [str(n).strip().lower() for n in names if pd.notna(n) and str(n).strip()]
-        pd.Series(names).drop_duplicates().to_csv(IND_REGISTER_PATH, index=False, header=["name"])
-        print(f"  IND register saved ({len(names)} entries).")
+        pd.Series(names).drop_duplicates().to_csv(
+            IND_REGISTER_PATH, index=False, header=["name"]
+        )
+        print(f"  IND register cached ({len(names)} sponsors).")
         return names
+
     except Exception as e:
         print(f"  Warning: could not download IND register — {e}")
         return []
@@ -44,6 +62,7 @@ def load_sponsors() -> set:
 # Load once at import time
 _SPONSORS = None
 
+
 def is_ind_sponsor(company_name: str) -> str:
     """
     Returns 'Yes', 'No', or 'Unknown' for a company name.
@@ -55,7 +74,6 @@ def is_ind_sponsor(company_name: str) -> str:
     if not _SPONSORS:
         return "Unknown"
     needle = company_name.lower().strip()
-    # Direct match or substring match in either direction
     for sponsor in _SPONSORS:
         if needle in sponsor or sponsor in needle:
             return "Yes"

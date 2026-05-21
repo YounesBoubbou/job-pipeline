@@ -1,11 +1,11 @@
 """
-scrapers/indeed.py — Scrape Dutch job boards.
-Sources: Werkzoeken.nl (server-side rendered, reliable)
-         + direct JSON APIs for Picnic and bol.com
+scrapers/indeed.py — Scrape tech job listings.
+Sources:
+  - RemoteOK API  (free, no auth — remote tech jobs worldwide)
+  - Arbeitnow API (free, no auth — EU / remote tech jobs)
 """
 
 import requests
-from bs4 import BeautifulSoup
 from datetime import datetime
 from filters import passes_all
 
@@ -19,161 +19,113 @@ HEADERS = {
 
 TODAY = datetime.today().strftime("%Y-%m-%d")
 
-SEARCH_QUERIES = [
-    "junior data engineer",
-    "graduate software engineer",
-    "junior machine learning engineer",
-    "junior python developer",
-    "data engineer trainee",
-    "junior backend engineer",
-    "graduate data scientist",
-    "analytics engineer",
-]
 
-
-def _fetch_werkzoeken(query: str) -> list[dict]:
+def _fetch_remoteok() -> list[dict]:
     """
-    Scrape Werkzoeken.nl — one of the best aggregators for NL jobs.
-    Server-side rendered so BeautifulSoup works perfectly.
+    RemoteOK — free API, no auth required, all-remote tech jobs.
+    https://remoteok.com/api
+    First element in the JSON array is metadata, skip it.
     """
     jobs = []
     try:
-        q = query.replace(" ", "+")
-        url = f"https://werkzoeken.nl/vacatures/?q={q}&where=Nederland"
-        r = requests.get(url, headers=HEADERS, timeout=15)
+        r = requests.get(
+            "https://remoteok.com/api",
+            headers={**HEADERS, "Accept": "application/json"},
+            timeout=15,
+        )
         r.raise_for_status()
-        soup = BeautifulSoup(r.text, "html.parser")
-
-        # Werkzoeken job cards
-        for card in soup.select("article.vacancy, div.vacancy, .job-item, li.job"):
-            title_el = card.select_one("h2, h3, .title, .vacancy-title")
-            link_el  = card.select_one("a[href]")
-            comp_el  = card.select_one(".company, .employer, [class*='company']")
-            loc_el   = card.select_one(".location, [class*='location']")
-
-            if not title_el or not link_el:
-                continue
-
-            title    = title_el.get_text(strip=True)
-            href     = link_el["href"]
-            company  = comp_el.get_text(strip=True) if comp_el else ""
-            location = loc_el.get_text(strip=True) if loc_el else "Netherlands"
-
-            if not href.startswith("http"):
-                href = "https://werkzoeken.nl" + href
-
-            if not passes_all(title, location):
-                continue
-
-            jobs.append({
-                "title":    title,
-                "company":  company,
-                "location": location,
-                "url":      href,
-                "source":   "Werkzoeken",
-                "date_found": TODAY,
-                "description_snippet": "",
-            })
-    except Exception as e:
-        print(f"    Werkzoeken warning ({query}): {e}")
-    return jobs
-
-
-def _fetch_picnic_api() -> list[dict]:
-    """
-    Picnic exposes a public jobs JSON endpoint — much more reliable than scraping.
-    """
-    jobs = []
-    try:
-        url = "https://jobs.picnic.app/api/jobs?language=en"
-        r = requests.get(url, headers=HEADERS, timeout=15)
-        r.raise_for_status()
-        data = r.json()
-
-        # Handle both list and dict responses
-        items = data if isinstance(data, list) else data.get("jobs", data.get("data", []))
+        items = [j for j in r.json() if isinstance(j, dict) and j.get("position")]
 
         for item in items:
-            title    = item.get("title", item.get("name", ""))
-            location = item.get("location", item.get("city", "Netherlands"))
-            job_id   = item.get("id", item.get("slug", ""))
-            href     = f"https://jobs.picnic.app/en/vacancies/{job_id}" if job_id else ""
+            title       = item.get("position", "")
+            company     = item.get("company", "")
+            description = item.get("description", "")[:300]
+            href        = item.get("apply_url") or item.get("url", "")
+
+            # All RemoteOK jobs are remote — ensure location passes our filter
+            raw_loc  = item.get("location", "")
+            location = raw_loc if raw_loc and raw_loc.lower() != "worldwide" else "Remote"
 
             if not title or not href:
                 continue
-            if not passes_all(title, location):
+            if not passes_all(title, location, description):
                 continue
 
             jobs.append({
-                "title":    title,
-                "company":  "Picnic",
-                "location": location,
-                "url":      href,
-                "source":   "Careers (Picnic)",
-                "date_found": TODAY,
-                "description_snippet": item.get("description", "")[:300],
+                "title":               title,
+                "company":             company,
+                "location":            location,
+                "url":                 href,
+                "source":              "RemoteOK",
+                "date_found":          TODAY,
+                "description_snippet": description,
             })
-        print(f"    Picnic API: {len(jobs)} matching jobs")
+
+        print(f"    RemoteOK: {len(jobs)} matching jobs")
     except Exception as e:
-        print(f"    Picnic API warning: {e}")
+        print(f"    RemoteOK warning: {e}")
     return jobs
 
 
-def _fetch_bol_api() -> list[dict]:
+def _fetch_arbeitnow() -> list[dict]:
     """
-    bol.com careers JSON API.
+    Arbeitnow — free API, no auth, EU & remote tech jobs.
+    Only keeps remote=True OR Netherlands-based roles.
+    https://arbeitnow.com/api
     """
     jobs = []
     try:
-        url = "https://careers.bol.com/en/jobs.json"
-        r = requests.get(url, headers=HEADERS, timeout=15)
-        r.raise_for_status()
-        data = r.json()
+        seen_urls = set()
+        for page in range(1, 4):
+            url = f"https://www.arbeitnow.com/api/job-board-api?page={page}"
+            r = requests.get(url, headers=HEADERS, timeout=15)
+            r.raise_for_status()
+            items = r.json().get("data", [])
+            if not items:
+                break
 
-        items = data if isinstance(data, list) else data.get("jobs", data.get("data", []))
+            for item in items:
+                title       = item.get("title", "")
+                raw_loc     = item.get("location", "")
+                href        = item.get("url", "")
+                description = item.get("description", "")[:300]
+                company     = item.get("company_name", "")
+                remote      = item.get("remote", False)
 
-        for item in items:
-            title    = item.get("title", item.get("name", ""))
-            location = item.get("location", "Netherlands")
-            href     = item.get("url", item.get("link", item.get("apply_url", "")))
+                if href in seen_urls:
+                    continue
 
-            if not title or not href:
-                continue
-            if not passes_all(title, location):
-                continue
+                is_nl = any(kw in raw_loc.lower() for kw in ["netherlands", "amsterdam", "rotterdam", "eindhoven"])
+                if not remote and not is_nl:
+                    continue
 
-            jobs.append({
-                "title":    title,
-                "company":  "bol.com",
-                "location": location,
-                "url":      href,
-                "source":   "Careers (bol.com)",
-                "date_found": TODAY,
-                "description_snippet": "",
-            })
-        print(f"    bol.com API: {len(jobs)} matching jobs")
+                location = raw_loc if raw_loc else ("Remote" if remote else "Netherlands")
+                if not passes_all(title, location, description):
+                    continue
+
+                seen_urls.add(href)
+                jobs.append({
+                    "title":               title,
+                    "company":             company,
+                    "location":            location,
+                    "url":                 href,
+                    "source":              "Arbeitnow",
+                    "date_found":          TODAY,
+                    "description_snippet": description,
+                })
+
+        print(f"    Arbeitnow: {len(jobs)} matching jobs")
     except Exception as e:
-        print(f"    bol.com API warning: {e}")
+        print(f"    Arbeitnow warning: {e}")
     return jobs
 
 
 def fetch_indeed_jobs() -> list[dict]:
-    """
-    Main entry point — named fetch_indeed_jobs for drop-in compatibility.
-    Scrapes Werkzoeken.nl + Picnic/bol.com JSON APIs.
-    """
-    all_jobs = []
+    """Main entry point — named for drop-in compatibility with main.py."""
+    all_jobs  = []
     seen_urls = set()
 
-    # Werkzoeken for broad market coverage
-    for query in SEARCH_QUERIES:
-        for job in _fetch_werkzoeken(query):
-            if job["url"] not in seen_urls:
-                seen_urls.add(job["url"])
-                all_jobs.append(job)
-
-    # Direct APIs for key target companies
-    for job in _fetch_picnic_api() + _fetch_bol_api():
+    for job in _fetch_remoteok() + _fetch_arbeitnow():
         if job["url"] not in seen_urls:
             seen_urls.add(job["url"])
             all_jobs.append(job)
