@@ -21,21 +21,29 @@ HEADERS = {
 TODAY = datetime.today().strftime("%Y-%m-%d")
 
 
+def _slug_to_title(url: str) -> str:
+    """Extract a human-readable title from a URL slug."""
+    import re
+    from urllib.parse import urlparse
+    path = urlparse(url).path
+    slug = path.rstrip("/").split("/")[-1]
+    slug = re.sub(r"-\d{4,}$", "", slug)  # strip trailing numeric IDs
+    return slug.replace("-", " ").replace("_", " ").title()
+
+
 def _extract_job_links(soup: BeautifulSoup, base_url: str) -> list[dict]:
     """
     Generic link extraction — looks for <a> tags that look like job listings.
-    Heuristic: links containing /job/ /vacancy/ /careers/ /opening/ /position/
+    Falls back to URL slug for title when link text is generic or missing.
     """
-    job_keywords = ["/job", "/vacancy", "/vacature", "/career", "/opening", "/position", "/role"]
+    job_url_keywords = ["/job", "/vacancy", "/vacature", "/career", "/opening", "/position", "/role"]
+    generic_texts = {"apply", "view", "read more", "meer info", "bekijk", "open", "details"}
     results = []
     seen = set()
 
     for a in soup.find_all("a", href=True):
         href = a["href"]
         text = a.get_text(strip=True)
-
-        if not text or len(text) < 4:
-            continue
 
         # Make absolute URL
         if href.startswith("/"):
@@ -47,10 +55,19 @@ def _extract_job_links(soup: BeautifulSoup, base_url: str) -> list[dict]:
 
         if href in seen:
             continue
+        if not any(kw in href.lower() for kw in job_url_keywords):
+            continue
 
-        if any(kw in href.lower() for kw in job_keywords):
-            seen.add(href)
-            results.append({"title": text, "url": href})
+        seen.add(href)
+
+        # If link text is missing, too short, or generic — derive title from URL slug
+        if not text or len(text) < 5 or text.lower() in generic_texts:
+            text = _slug_to_title(href)
+
+        if not text or len(text) < 5:
+            continue
+
+        results.append({"title": text, "url": href})
 
     return results
 

@@ -21,30 +21,13 @@ KEYWORDS_EXCLUDE = [
 # ── Location filter ───────────────────────────
 LOCATIONS = ["amsterdam", "netherlands", "nl", "hybrid", "remote"]
 
-# ── Indeed RSS searches ───────────────────────
-# Each entry is one RSS feed (one search query + location)
-INDEED_RSS_FEEDS = [
-    "https://www.indeed.com/rss?q=junior+data+engineer&l=Amsterdam%2C+Netherlands&sort=date",
-    "https://www.indeed.com/rss?q=graduate+software+engineer&l=Amsterdam%2C+Netherlands&sort=date",
-    "https://www.indeed.com/rss?q=junior+machine+learning+engineer&l=Netherlands&sort=date",
-    "https://www.indeed.com/rss?q=junior+python+developer&l=Amsterdam%2C+Netherlands&sort=date",
-    "https://www.indeed.com/rss?q=data+engineer+trainee&l=Netherlands&sort=date",
-    "https://www.indeed.com/rss?q=graduate+data+scientist&l=Netherlands&sort=date",
-]
+# ── Job board search queries ──────────────────
+# Used by Werkzoeken.nl scraper — edit in scrapers/indeed.py → SEARCH_QUERIES
 
 # ── Company career pages to watch ─────────────
-# Add more as you like — just needs a careers URL and a name
+# Note: Picnic and bol.com are fetched via their JSON APIs in the job boards scraper
+# Add more companies here — needs a careers URL and a name
 COMPANY_PAGES = [
-    {
-        "name": "Picnic",
-        "url": "https://jobs.picnic.app/en/vacancies",
-        "keyword_in_url": "picnic",
-    },
-    {
-        "name": "bol.com",
-        "url": "https://careers.bol.com/en/jobs",
-        "keyword_in_url": "bol.com",
-    },
     {
         "name": "Booking.com",
         "url": "https://jobs.booking.com/careers",
@@ -52,8 +35,18 @@ COMPANY_PAGES = [
     },
     {
         "name": "RIPE NCC",
-        "url": "https://www.ripe.net/about-us/careers/",
+        "url": "https://www.ripe.net/about-us/vacancies/",
         "keyword_in_url": "ripe",
+    },
+    {
+        "name": "SURF",
+        "url": "https://www.surf.nl/en/about-surf/working-at-surf",
+        "keyword_in_url": "surf",
+    },
+    {
+        "name": "Catawiki",
+        "url": "https://catawiki.com/jobs",
+        "keyword_in_url": "catawiki",
     },
 ]
 
