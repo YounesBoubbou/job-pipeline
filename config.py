@@ -3,6 +3,10 @@
 #  Edit this file to customise your search
 # ─────────────────────────────────────────────
 
+from dotenv import load_dotenv
+
+load_dotenv()  # loads ANTHROPIC_API_KEY (and any other secrets) from .env, if present
+
 # ── Search terms ──────────────────────────────
 KEYWORDS_INCLUDE = [
     "junior", "graduate", "traineeship", "trainee",
@@ -60,3 +64,8 @@ IND_REGISTER_PATH = "data/ind_sponsors.csv"
 IND_REGISTER_URL  = (
     "https://ind.nl/en/documents/02-2022/publiekregister_erkende_referenten_en.xlsx"
 )
+
+# ── Tailored CV generation ────────────────────
+# Requires ANTHROPIC_API_KEY set in your environment
+BASE_CV_PATH     = "data/base_cv.tex"
+GENERATED_CV_DIR = "data/generated"

@@ -101,6 +101,60 @@ class StatusUpdate(BaseModel):
     status: str
 
 
+class CVRequest(BaseModel):
+    url: str
+
+
+@app.post("/api/jobs/generate-cv")
+def generate_cv(req: CVRequest):
+    """Generate a JD-tailored CV (.tex) for the job identified by its URL."""
+    if not os.path.exists(CSV_PATH):
+        raise HTTPException(status_code=404, detail="No jobs data found")
+
+    df = pd.read_csv(CSV_PATH, dtype=str).fillna("")
+    matches = df[df["url"] == req.url]
+    if matches.empty:
+        raise HTTPException(status_code=404, detail="Job not found")
+    job = matches.iloc[0].to_dict()
+
+    from cv_generator import generate_tailored_cv, save_generated_cv
+
+    try:
+        tex = generate_tailored_cv(job)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+    filename = save_generated_cv(job, tex)
+    return {"ok": True, "filename": filename, "tex": tex}
+
+
+@app.post("/api/jobs/generate-cover-letter")
+def generate_cover_letter_endpoint(req: CVRequest):
+    """Generate a JD-tailored cover letter (.txt) for the job identified by its URL."""
+    if not os.path.exists(CSV_PATH):
+        raise HTTPException(status_code=404, detail="No jobs data found")
+
+    df = pd.read_csv(CSV_PATH, dtype=str).fillna("")
+    matches = df[df["url"] == req.url]
+    if matches.empty:
+        raise HTTPException(status_code=404, detail="Job not found")
+    job = matches.iloc[0].to_dict()
+
+    from cover_letter_generator import generate_cover_letter, save_cover_letter
+
+    try:
+        letter = generate_cover_letter(job)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+    filename = save_cover_letter(job, letter)
+    return {"ok": True, "filename": filename, "letter": letter}
+
+
 @app.get("/api/tracker")
 def get_tracker():
     """Return all rows from the Applications Google Sheet tab."""
