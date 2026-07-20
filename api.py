@@ -73,7 +73,7 @@ def _get_tracker_sheet():
         return spreadsheet.worksheet(TRACKER_TAB)
     except gspread.exceptions.WorksheetNotFound:
         ws = spreadsheet.add_worksheet(title=TRACKER_TAB, rows=1000, cols=10)
-        ws.append_row(TRACKER_COLUMNS)
+        ws.insert_row(TRACKER_COLUMNS, index=1)
         return ws
 
 

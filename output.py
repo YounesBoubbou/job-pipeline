@@ -79,9 +79,10 @@ def write_sheets(jobs: list[dict]):
         client = gspread.authorize(creds)
         sheet = client.open(SPREADSHEET_NAME).sheet1
 
-        # Write header if sheet is empty
-        if sheet.row_count == 0 or not sheet.get_all_values():
-            sheet.append_row(COLUMNS)
+        # Write header if row 1 is empty (append_row on a pristine sheet
+        # races with the table-detection heuristic and can clobber itself)
+        if not sheet.row_values(1):
+            sheet.insert_row(COLUMNS, index=1)
 
         for job in jobs:
             row = [job.get(col, "") for col in COLUMNS]

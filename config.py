@@ -44,7 +44,7 @@ COMPANY_PAGES = [
 
 # ── Google Sheets output ──────────────────────
 # Set SHEETS_ENABLED = False to just output a local CSV instead
-SHEETS_ENABLED = False          # flip to True once you add credentials
+SHEETS_ENABLED = True           # credentials.json is set up and sheet is shared
 SHEETS_CREDENTIALS_FILE = "credentials.json"   # service account JSON
 SPREADSHEET_NAME = "Job Pipeline"              # exact name of your Sheet
 
