@@ -13,7 +13,7 @@ KEYWORDS_INCLUDE = [
     "data engineer", "data scientist", "ml engineer",
     "machine learning engineer", "software engineer",
     "backend engineer", "python developer", "medior",
-    "data analyst", "analytics engineer",
+    "data analyst", "analytics engineer", "ai engineer",
 ]
 
 KEYWORDS_EXCLUDE = [
@@ -23,7 +23,7 @@ KEYWORDS_EXCLUDE = [
 ]
 
 # ── Location filter ───────────────────────────
-LOCATIONS = ["amsterdam", "netherlands", "nl", "hybrid", "remote"]
+LOCATIONS = ["amsterdam", "netherlands", "nl", "hybrid", "remote", "rotterdam", "utrecht", "den haag"]
 
 # ── Job board search queries ──────────────────
 # Used by Werkzoeken.nl scraper — edit in scrapers/indeed.py → SEARCH_QUERIES
