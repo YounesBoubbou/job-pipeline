@@ -50,6 +50,25 @@ def _download_register():
         return []
 
 
+# Trailing tokens stripped by normalise_name(). End-of-name only, whole tokens only.
+_STRIP_SUFFIXES = {
+    "b.v.", "b.v", "bv", "n.v.", "nv", "i.o.", "v.o.f.", "vof", "u.a.", "c.v.",
+    "limited", "ltd", "ltd.", "gmbh", "inc.", "llp", "s.a.", "se",
+    "holding", "holdings", "netherlands", "nederland",
+}
+
+
+def normalise_name(raw: str) -> str:
+    """
+    Reduce a company name to a comparable stem.
+    e.g. 'adyen netherlands b.v. i.o.' -> 'adyen', 'booking.com b.v.' -> 'booking.com'
+    """
+    tokens = raw.lower().strip().replace('"', "").split()
+    while len(tokens) > 1 and tokens[-1] in _STRIP_SUFFIXES:
+        tokens.pop()
+    return " ".join(tokens)
+
+
 def load_sponsors() -> set:
     """Return a set of lowercase sponsor company names."""
     if not os.path.exists(IND_REGISTER_PATH):
