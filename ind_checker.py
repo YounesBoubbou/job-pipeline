@@ -70,12 +70,12 @@ def normalise_name(raw: str) -> str:
 
 
 def load_sponsors() -> set:
-    """Return a set of lowercase sponsor company names."""
+    """Return a set of normalised sponsor company names (see normalise_name)."""
     if not os.path.exists(IND_REGISTER_PATH):
         names = _download_register()
-        return set(names)
-    df = pd.read_csv(IND_REGISTER_PATH)
-    return set(df["name"].str.lower().str.strip().tolist())
+    else:
+        names = pd.read_csv(IND_REGISTER_PATH)["name"].dropna().tolist()
+    return {normalise_name(n) for n in names}
 
 
 # Load once at import time
@@ -85,15 +85,12 @@ _SPONSORS = None
 def is_ind_sponsor(company_name: str) -> str:
     """
     Returns 'Yes', 'No', or 'Unknown' for a company name.
-    Uses fuzzy substring matching — e.g. 'booking.com bv' matches 'booking'.
+    Exact match on normalised names — e.g. 'Booking.com' matches 'booking.com b.v.',
+    but 'Gradyent' does not match 'adyen n.v.'.
     """
     global _SPONSORS
     if _SPONSORS is None:
         _SPONSORS = load_sponsors()
     if not _SPONSORS:
         return "Unknown"
-    needle = company_name.lower().strip()
-    for sponsor in _SPONSORS:
-        if needle in sponsor or sponsor in needle:
-            return "Yes"
-    return "No"
+    return "Yes" if normalise_name(company_name) in _SPONSORS else "No"
