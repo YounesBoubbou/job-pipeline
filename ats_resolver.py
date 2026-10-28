@@ -47,6 +47,8 @@ def board_tokens(name: str) -> list:
 def _probe(vendor: str, token: str):
     """True = board found, False = no board, None = request failed (try again next run)."""
     url, is_hit = VENDORS[vendor]
+    if vendor == "recruitee" and len(token) > 63:  # longer than a DNS label allows
+        return False
     try:
         r = requests.get(url.format(t=token), headers=HEADERS, timeout=10,
                          allow_redirects=False)
