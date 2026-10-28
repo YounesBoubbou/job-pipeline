@@ -18,7 +18,7 @@ Daily job discovery pipeline. Starts from the IND recognised sponsor register, r
 sponsors to their job boards, and fetches openings. Aggregator scrapers (RemoteOK,
 Arbeitnow, Greenhouse) run alongside as a secondary source.
 
-Current: 6 Python files, CSV + Google Sheets output, no tests, GitHub Actions daily.
+Current: 6 Python files, CSV + Google Sheets output, pytest tests in `tests/` (run `python -m pytest`), GitHub Actions daily.
 Target: hardened extraction, CI gates, orchestration.
 
 # Conventions

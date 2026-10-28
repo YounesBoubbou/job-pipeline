@@ -2,11 +2,23 @@
 filters.py — Keyword and location filtering for job postings.
 """
 
+import re
+
 from config import KEYWORDS_INCLUDE, KEYWORDS_EXCLUDE, LOCATIONS
 
 # Normalise the text first
 def _normalise(text: str) -> str:
     return text.lower().replace("-", " ").replace("_", " ")
+
+# Whole-word match, so "lead" doesn't hit "leading" and "nl" doesn't hit "Finland"
+def _contains_word(haystack: str, word: str) -> bool:
+    return re.search(rf"\b{re.escape(word.strip())}\b", haystack) is not None
+
+# "5+ years", "5-7 years", "at least 6 years" of experience — 5 or more, not "3-5 years".
+# Needs "experience" after it, so "building software for 20 years" doesn't count.
+_YEARS_REQUIRED = re.compile(
+    r"(?<![\d\-–])\b([5-9]|[1-9]\d)\s*(\+|[\-–]\s*\d+)?\s*years?'?\s+(of\s+)?(\w+\s+)?experience"
+)
 
 # Detect if keyword(s) appear in title or description
 def passes_include(title: str, description: str = "") -> bool:
@@ -17,16 +29,19 @@ def passes_include(title: str, description: str = "") -> bool:
 # Filter out the jobs that contain exclude keywords
 def passes_exclude(title: str, description: str = "") -> bool:
     """Returns True if NO exclude keyword is found (i.e. job is safe to keep)."""
-    haystack = _normalise(f"{title} {description}")
-    return not any(kw.lower() in haystack for kw in KEYWORDS_EXCLUDE)
+    text = f"{title} {description}".lower()
+    if _YEARS_REQUIRED.search(text):
+        return False
+    haystack = _normalise(text)
+    return not any(_contains_word(haystack, kw.lower()) for kw in KEYWORDS_EXCLUDE)
 
 # Filter out the jobs based on location
 def passes_location(location: str) -> bool:
-    """Location string must contain at least one of the allowed locations."""
+    """Location string must contain at least one of the allowed locations, as a whole word."""
     if not location:
-        return True   # if location is missing, don't filter it out
+        return False   # no location means we can't tell it's in the NL
     loc = location.lower()
-    return any(allowed.lower() in loc for allowed in LOCATIONS)
+    return any(_contains_word(loc, allowed.lower()) for allowed in LOCATIONS)
 
 # Return the jobs that pass all of the filtering steps
 def passes_all(title: str, location: str = "", description: str = "") -> bool:

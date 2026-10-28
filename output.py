@@ -7,6 +7,7 @@ import csv
 import json
 from datetime import datetime
 from config import CSV_OUTPUT_PATH, SEEN_CACHE_PATH, SHEETS_ENABLED
+from ind_checker import normalise_name
 
 COLUMNS = [
     "date_found", "title", "company", "location",
@@ -29,11 +30,22 @@ def save_seen(seen: set):
         json.dump(list(seen), f)
 
 
+def _posting_key(job: dict) -> str:
+    """Same company + title = same posting, even when two sources give different URLs."""
+    title = " ".join(job["title"].lower().split())
+    return f"{normalise_name(job['company'])}|{title}"
+
+
 def deduplicate(jobs: list[dict], seen: set) -> list[dict]:
-    """Filter out jobs already seen in previous runs."""
-    new_jobs = [j for j in jobs if j["url"] not in seen]
-    for j in new_jobs:
+    """Filter out jobs already seen in previous runs, or earlier in this one."""
+    new_jobs = []
+    for j in jobs:
+        key = _posting_key(j)
+        if j["url"] in seen or key in seen:
+            continue
         seen.add(j["url"])
+        seen.add(key)
+        new_jobs.append(j)
     return new_jobs
 
 
