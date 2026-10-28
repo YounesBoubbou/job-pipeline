@@ -38,6 +38,10 @@ jobs:
           key: ind-register-${{ github.run_id }}
           restore-keys: ind-register-
 
+      # Stop before touching any data if a filter or dedup test fails
+      - name: Run tests
+        run: python -m pytest -q
+
       - name: Run pipeline
         run: python main.py
 

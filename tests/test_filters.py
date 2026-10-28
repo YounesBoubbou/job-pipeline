@@ -40,3 +40,14 @@ def test_exclude_keeps_junior_year_requirements():
     assert passes_exclude("Data Engineer", "1-2 years of experience")
     assert passes_exclude("Data Engineer", "3-5 years of experience")
     assert passes_exclude("Data Engineer", "We have been building software for 20 years")
+
+
+def test_location_accepts_bare_work_mode():
+    assert passes_location("Remote")
+    assert passes_location("Remote job")
+    assert passes_location("Hybrid - Amsterdam")
+
+
+def test_location_rejects_remote_elsewhere():
+    assert not passes_location("Remote - Indonesia; Remote - Malaysia")
+    assert not passes_location("Remote, United States")

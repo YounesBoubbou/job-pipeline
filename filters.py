@@ -35,13 +35,23 @@ def passes_exclude(title: str, description: str = "") -> bool:
     haystack = _normalise(text)
     return not any(_contains_word(haystack, kw.lower()) for kw in KEYWORDS_EXCLUDE)
 
+# Work modes in LOCATIONS — they say how, not where
+_WORK_MODES = {"remote", "hybrid"}
+
 # Filter out the jobs based on location
 def passes_location(location: str) -> bool:
-    """Location string must contain at least one of the allowed locations, as a whole word."""
+    """
+    Passes if the location names an NL place (whole word), or is only a work mode
+    like "Remote" — but not "Remote - Indonesia", which can't get you a Dutch visa.
+    """
     if not location:
         return False   # no location means we can't tell it's in the NL
     loc = location.lower()
-    return any(_contains_word(loc, allowed.lower()) for allowed in LOCATIONS)
+    places = [p.lower() for p in LOCATIONS if p.lower() not in _WORK_MODES]
+    if any(_contains_word(loc, p) for p in places):
+        return True
+    words = set(re.findall(r"[a-z]+", loc))
+    return bool(words) and words <= _WORK_MODES | {"job"}
 
 # Return the jobs that pass all of the filtering steps
 def passes_all(title: str, location: str = "", description: str = "") -> bool:
