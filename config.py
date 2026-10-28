@@ -65,6 +65,11 @@ IND_REGISTER_URL  = (
     "https://ind.nl/en/documents/02-2022/publiekregister_erkende_referenten_en.xlsx"
 )
 
+# ── ATS resolution (sponsor → careers board) ──
+# Built incrementally by ats_resolver.py — see ADR-0003
+ATS_MAP_PATH      = "data/ats_map.json"
+ATS_BATCH_SIZE    = 150     # sponsor names probed per run (~25 min at 1 req/s)
+
 # ── Tailored CV generation ────────────────────
 # Requires ANTHROPIC_API_KEY set in your environment
 BASE_CV_PATH     = "data/base_cv.tex"
