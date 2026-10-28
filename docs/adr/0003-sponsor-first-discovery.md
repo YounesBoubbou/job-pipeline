@@ -2,7 +2,7 @@
 
 Date: 2026-08-19
 
-Status: accepted
+Status: accepted; the "ATS resolution is the filter" constraint is superseded by [0005](0005-target-list-as-primary-source.md)
 
 ## Context
 

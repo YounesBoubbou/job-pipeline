@@ -2,7 +2,7 @@
 
 Date: 2026-10-28
 
-Status: accepted
+Status: accepted; section 3 (ATS resolution) is superseded by [0005](0005-target-list-as-primary-source.md)
 
 ## Context
 
