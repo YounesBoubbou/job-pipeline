@@ -10,6 +10,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from datetime import datetime
 from scrapers.indeed import fetch_indeed_jobs
 from scrapers.company_pages import fetch_company_jobs
+from scrapers.targets import fetch_target_jobs
 from ind_checker import is_ind_sponsor
 from output import load_seen, save_seen, deduplicate, write_csv, write_sheets
 
@@ -26,7 +27,10 @@ def run():
     print("\n[2/4] Scraping company career pages...")
     company_jobs = fetch_company_jobs()
 
-    all_jobs = indeed_jobs + company_jobs
+    print("\n  Fetching target-list boards...")
+    target_jobs = fetch_target_jobs()
+
+    all_jobs = indeed_jobs + company_jobs + target_jobs
     print(f"\n  Total raw (pre-dedup): {len(all_jobs)} jobs")
 
     # ── 2. Deduplicate against previous runs ───────────────
