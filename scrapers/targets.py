@@ -9,6 +9,7 @@ moved to another ATS and the row needs updating.
 
 import csv
 import os
+import re
 from datetime import datetime
 
 import requests
@@ -88,10 +89,26 @@ def _workday(token):
         if total is None:
             total = data["total"]
         for j in data["jobPostings"]:
-            yield j["title"], j.get("locationsText", ""), base + j["externalPath"], ""
+            if "title" not in j or "externalPath" not in j:  # some boards pad pages with stubs
+                continue
+            location = j.get("locationsText", "")
+            # Multi-location jobs only say "3 Locations"; the detail endpoint lists them.
+            if re.fullmatch(r"\d+ Locations", location):
+                location = _workday_locations(f"{host}/wday/cxs/{tenant}/{site}{j['externalPath']}") or location
+            yield j["title"], location, base + j["externalPath"], ""
         offset += 20
         if offset >= total or not data["jobPostings"]:
             break
+
+
+def _workday_locations(detail_url):
+    try:
+        r = requests.get(detail_url, headers=HEADERS, timeout=TIMEOUT)
+        r.raise_for_status()
+        info = r.json()["jobPostingInfo"]
+    except Exception:
+        return ""
+    return "; ".join([info.get("location", "")] + info.get("additionalLocations", []))
 
 
 FETCHERS = {

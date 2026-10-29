@@ -108,9 +108,9 @@ Oracle,Oracle Nederland,Oracle Global Services Netherlands B.V.; Oracle Financia
 SAP,SAP Nederland B.V.,,Big tech & software,,,,none
 IBM,IBM Nederland B.V.,IBM International Group B.V.; IBM Services Center Benelux B.V.,Big tech & software,,,,none
 Cisco,Cisco Systems International B.V.,Cisco Netherlands B.V.,Big tech & software,,,,none
-Adobe,Adobe Systems Benelux B.V.,,Big tech & software,,,,none
+Adobe,Adobe Systems Benelux B.V.,,Big tech & software,,workday,https://adobe.wd5.myworkdayjobs.com/external_experienced,hand
 Atlassian,Atlassian B.V.,,Big tech & software,,,,none
-Workday,Workday B.V.,,Big tech & software,,,,none
+Workday,Workday B.V.,,Big tech & software,,workday,https://workday.wd5.myworkdayjobs.com/Workday,hand
 Lightspeed,Lightspeed Netherlands B.V.,,Big tech & software,,,,none
 Alibaba,Alibaba (Netherlands) B.V.,,Big tech & software,,,,none
 Tencent,Tencent International Service Europe B.V.,,Big tech & software,,,,none
@@ -126,7 +126,7 @@ MongoDB,MongoDB Netherlands B.V.,,Big tech & software,,greenhouse,mongodb,hand
 GitLab,GitLab B.V.,,Big tech & software,,greenhouse,gitlab,auto
 GitHub,GitHub B.V.,,Big tech & software,,,,none
 JetBrains,JetBrains N.V.,,Big tech & software,,greenhouse,jetbrains,auto
-Red Hat,Red Hat B.V.,,Big tech & software,,,,none
+Red Hat,Red Hat B.V.,,Big tech & software,,workday,https://redhat.wd5.myworkdayjobs.com/jobs,hand
 VMware,VMware Netherlands B.V.,,Big tech & software,,,,none
 Broadcom,Broadcom Netherlands B.V.,Avago Technologies Holdings B.V.; CA Software Holding B.V.,Big tech & software,,,,none
 Dell,Dell Benelux Call Centre,,Big tech & software,,,,none
@@ -179,7 +179,7 @@ Ivanti,Ivanti Software B.V.,,Big tech & software,,,,none
 Jamf,"JAMF Software Atlantic, B.V.",,Big tech & software,,greenhouse,jamf,hand
 Veeam,Veeam Software B.V.,,Big tech & software,,greenhouse,veeamsoftware,hand
 Cloud Software Group (Citrix),Cloud Software Group Netherlands B.V.,,Big tech & software,,,,none
-Autodesk,Autodesk B.V.,,Big tech & software,,,,none
+Autodesk,Autodesk B.V.,,Big tech & software,,workday,https://autodesk.wd1.myworkdayjobs.com/Ext,hand
 Dassault Systèmes,Dassault Systèmes B.V.,,Big tech & software,,,,none
 Ansys,ANSYS Netherlands,,Big tech & software,,,,none
 PTC,Parametric Technology Nederland B.V.,,Big tech & software,,,,none
@@ -215,11 +215,11 @@ MIH Fintech (Prosus),MIH Fintech Holdings B.V.,,Fintech & payments,,,,none
 Ohpen,OHPEN Technology B.V.,OHPEN Services B.V.,Fintech & payments,,,,none
 Stripe,Stripe Netherlands B.V.,,Fintech & payments,,greenhouse,stripe,auto
 Klarna,Klarna B.V.,,Fintech & payments,,,,none
-PayPal,PayPal Limited,,Fintech & payments,,,,none
+PayPal,PayPal Limited,,Fintech & payments,,workday,https://paypal.wd1.myworkdayjobs.com/jobs,hand
 Worldline,Worldline N.V.,Worldline Digital Commerce,Fintech & payments,,,,none
 equensWorldline,equensWorldline N.V.,equensWorldline SE,Fintech & payments,,,,none
 Checkout.com,Checkout Group B.V.,,Fintech & payments,,,,none
-Mastercard,Mastercard Nederland,,Fintech & payments,,,,none
+Mastercard,Mastercard Nederland,,Fintech & payments,,workday,https://mastercard.wd1.myworkdayjobs.com/CorporateCareers,hand
 Visa,Visa Europe (Netherlands) B.V.,Visa Service Desk Beheer B.V.,Fintech & payments,,,,none
 American Express,"American Express Payments Europe, S.L. (Netherlands branch)",,Fintech & payments,,,,none
 Euronext,Euronext Amsterdam N.V.,,Fintech & payments,,,,none
@@ -282,13 +282,13 @@ Citadel Securities,Citadel Securities Netherlands Services B.V.,,Trading & quant
 Jane Street,Jane Street Netherlands B.V.,,Trading & quant,,greenhouse,janestreet,hand
 Jump Trading,Jump Trading Europe B.V.,,Trading & quant,,greenhouse,jumptrading,auto
 Headlands Technologies,Headlands Technologies Europe B.V.,,Trading & quant,,,,none
-ING,ING Bank N.V.,ING Groep N.V.; ING Bank Personeel B.V.,Banks & insurance,,,,none
+ING,ING Bank N.V.,ING Groep N.V.; ING Bank Personeel B.V.,Banks & insurance,,workday,https://ing.wd3.myworkdayjobs.com/ICSGBLCOR,hand
 ABN AMRO,ABN AMRO Bank N.V.,ABN AMRO Asset Based Finance N.V.,Banks & insurance,yes,,,none
 Rabobank,Coöperatieve Rabobank U.A.,,Banks & insurance,yes,,,none
 Triodos Bank,Triodos Bank N.V.,Triodos Investment Management B.V.,Banks & insurance,,,,none
 Saxo,Saxo Bank A/S,,Banks & insurance,yes,,,none
 Achmea,Achmea Interne Diensten N.V.,,Banks & insurance,,recruitee,achmea,review
-NN Group,NN Insurance Eurasia N.V.,,Banks & insurance,,,,none
+NN Group,NN Insurance Eurasia N.V.,,Banks & insurance,,workday,https://nngroup.wd3.myworkdayjobs.com/WDExternal,hand
 Aegon,AEGON N.V.,AEGON Employees Netherlands B.V.,Banks & insurance,,,,none
 a.s.r.,ASR Nederland N.V.,,Banks & insurance,,,,none
 APG,APG Groep N.V.,APG Asset Management N.V.; APG Pensioendienstverlening N.V.,Banks & insurance,,,,none
@@ -296,15 +296,15 @@ PGGM,PGGM N.V.,,Banks & insurance,,,,none
 MN,Mn Services,,Banks & insurance,,,,none
 Robeco,Robeco Nederland B.V.,,Banks & insurance,,,,none
 Van Lanschot Kempen,Van Lanschot Kempen N.V.,,Banks & insurance,,,,none
-Deutsche Bank,Deutsche Bank,,Banks & insurance,,,,none
+Deutsche Bank,Deutsche Bank,,Banks & insurance,,workday,https://db.wd3.myworkdayjobs.com/dbwebsite,hand
 BNP Paribas,"BNP Paribas SA, Netherlands Branch",BNP Paribas Cardif B.V.; BNP Paribas Personal Finance B.V.,Banks & insurance,,,,none
-Citi,Citibank Europe Public Limited Company Netherlands Branch,,Banks & insurance,,,,none
+Citi,Citibank Europe Public Limited Company Netherlands Branch,,Banks & insurance,,workday,https://citi.wd5.myworkdayjobs.com/2,hand
 J.P. Morgan,J.P. Morgan SE Amsterdam Branch,,Banks & insurance,,,,none
 Goldman Sachs,"Goldman Sachs Bank Europe SE, Amsterdam Branch",Goldman Sachs Personeel B.V.,Banks & insurance,,,,none
-Barclays,"Barclays Bank Ireland Plc, Netherlands branch",,Banks & insurance,,,,none
+Barclays,"Barclays Bank Ireland Plc, Netherlands branch",,Banks & insurance,,workday,https://barclays.wd3.myworkdayjobs.com/External_Career_Site_Barclays,hand
 HSBC,HSBC Continental Europe,,Banks & insurance,,,,none
-BlackRock,BlackRock (Netherlands) B.V.,,Banks & insurance,,,,none
-State Street,State Street Bank International GmbH Amsterdam Branch,,Banks & insurance,,,,none
+BlackRock,BlackRock (Netherlands) B.V.,,Banks & insurance,,workday,https://blackrock.wd1.myworkdayjobs.com/BlackRock_Professional,hand
+State Street,State Street Bank International GmbH Amsterdam Branch,,Banks & insurance,,workday,https://statestreet.wd1.myworkdayjobs.com/Global,hand
 Northern Trust,Northern Trust Fund Managers (Ireland) Limited Netherlands Branch,,Banks & insurance,,,,none
 Allianz,Allianz Nederland Groep N.V.,"Allianz Technology SE; Allianz Benelux; Allianz Direct Versicherungs-AG, Dutch branch; Allianz Global Assistance; Allianz Global Corporate & Specialty SE",Banks & insurance,,,,none
 Zurich,Zurich Insurance Europe AG,,Banks & insurance,,,,none
@@ -393,14 +393,14 @@ Eagle Eye Networks,Eagle Eye Networks B.V.,,Cybersecurity,,,,none
 March Networks,March Networks B.V.,,Cybersecurity,,,,none
 Nedap,Nedap N.V.,,"Hardware, semiconductors & deep tech",,,,none
 ASML,ASML Netherlands B.V.,ASML Holding N.V.; ASML Trading B.V.,"Hardware, semiconductors & deep tech",,,,none
-NXP Semiconductors,NXP Semiconductors Netherlands B.V.,NXP Semiconductors N.V.; NXP B.V.,"Hardware, semiconductors & deep tech",,,,none
+NXP Semiconductors,NXP Semiconductors Netherlands B.V.,NXP Semiconductors N.V.; NXP B.V.,"Hardware, semiconductors & deep tech",,workday,https://nxp.wd3.myworkdayjobs.com/careers,hand
 Signify,Signify Netherlands B.V.,Signify N.V.; Signify Holding B.V.,"Hardware, semiconductors & deep tech",,,,none
 ASM International,ASM International N.V.,ASM Europe BV; ASM IP Holding B.V.,"Hardware, semiconductors & deep tech",,,,none
 Besi,BE Semiconductor Industries N.V.,Besi Netherlands B.V.,"Hardware, semiconductors & deep tech",,,,none
 Nexperia,Nexperia B.V.,,"Hardware, semiconductors & deep tech",,,,none
 Prodrive Technologies,Prodrive Technologies B.V.,Prodrive Technologies Innovation Services B.V.; Prodrive Technologies N.E. B.V.; Prodrive Technologies Services B.V.,"Hardware, semiconductors & deep tech",,,,none
 VDL ETG,VDL Enabling Technologies Group Eindhoven B.V.,VDL Enabling Technologies Group Almelo B.V.; VDL ETG Technology & Development B.V.; VDL ETG Precision B.V.; VDL ETG Projects B.V.,"Hardware, semiconductors & deep tech",,,,none
-Thermo Fisher Scientific,Thermo Fisher Scientific B.V.,FEI Electron Optics B.V.; FEI Europe B.V.,"Hardware, semiconductors & deep tech",,,,none
+Thermo Fisher Scientific,Thermo Fisher Scientific B.V.,FEI Electron Optics B.V.; FEI Europe B.V.,"Hardware, semiconductors & deep tech",,workday,https://thermofisher.wd5.myworkdayjobs.com/ThermoFisherCareers,hand
 Canon Production Printing,Canon Production Printing Netherlands B.V.,OCE Nederland B.V.,"Hardware, semiconductors & deep tech",,,,none
 Canon,Canon Europa N.V.,Canon Medical Systems Europe B.V.; Canon Medical Informatics Europe B.V.; Canon Medical Components Europe B.V.,"Hardware, semiconductors & deep tech",,,,none
 QuantWare,QuantWare B.V.,,"Hardware, semiconductors & deep tech",,recruitee,quantware,review
@@ -448,13 +448,13 @@ Honeywell,Honeywell B.V.,,"Hardware, semiconductors & deep tech",,,,none
 Rockwell Automation,Rockwell Automation B.V.,,"Hardware, semiconductors & deep tech",,,,none
 Emerson,Emerson Process Management,Emerson Automation Solutions Final Control Netherlands B.V.,"Hardware, semiconductors & deep tech",,,,none
 Beckhoff Automation,Beckhoff Automation B.V.,,"Hardware, semiconductors & deep tech",,,,none
-Intel,Intel Benelux B.V.,Intel International B.V.,"Hardware, semiconductors & deep tech",,,,none
-NVIDIA,NVIDIA Dutch B.V.,,"Hardware, semiconductors & deep tech",,,,none
+Intel,Intel Benelux B.V.,Intel International B.V.,"Hardware, semiconductors & deep tech",,workday,https://intel.wd1.myworkdayjobs.com/External,hand
+NVIDIA,NVIDIA Dutch B.V.,,"Hardware, semiconductors & deep tech",,workday,https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite,hand
 Qualcomm,Qualcomm Technologies Netherlands B.V.,,"Hardware, semiconductors & deep tech",,,,none
 Texas Instruments,Texas Instruments Holland B.V.,,"Hardware, semiconductors & deep tech",,,,none
 Infineon,Infineon Technologies Nijmegen B.V.,Infineon Technologies Holding B.V.,"Hardware, semiconductors & deep tech",,,,none
 Synopsys,Synopsys Netherlands B.V.,Synopsys Software Netherlands B.V.,"Hardware, semiconductors & deep tech",,,,none
-Cadence,Cadence Design Systems B.V.,,"Hardware, semiconductors & deep tech",,,,none
+Cadence,Cadence Design Systems B.V.,,"Hardware, semiconductors & deep tech",,workday,https://cadence.wd1.myworkdayjobs.com/External_Careers,hand
 Applied Materials,Applied Materials Europe B.V.,,"Hardware, semiconductors & deep tech",,,,none
 Lam Research,Lam Research International B.V.,,"Hardware, semiconductors & deep tech",,,,none
 Tokyo Electron,Tokyo Electron Europe Limited - Netherlands Branch,,"Hardware, semiconductors & deep tech",,,,none
@@ -815,7 +815,7 @@ Kuehne + Nagel,Kuehne + Nagel N.V.,Kuehne + Nagel Logistics B.V.,"Mobility, trav
 DSV,DSV Air & Sea Nederland B.V.,DSV Road B.V.; DSV Contract Logistics B.V.; DSV Road Holding N.V.,"Mobility, travel & logistics",,,,none
 CEVA Logistics,CEVA Logistics Headoffice B.V.,CEVA Logistics Netherlands B.V.; CEVA Freight Holland B.V.,"Mobility, travel & logistics",,,,none
 DP World,DP World Logistics Europe B.V.,DP World Logistics Netherlands B.V.; DP World Inland B.V.,"Mobility, travel & logistics",,,,none
-Philips,Philips Electronics Nederland B.V.,Koninklijke Philips N.V.; Philips International B.V.; Philips Medical Systems Nederland B.V.; Philips Nederland B.V.; Philips Consumer Lifestyle B.V.; Philips Oral Healthcare B.V.,Health & life sciences tech,,,,none
+Philips,Philips Electronics Nederland B.V.,Koninklijke Philips N.V.; Philips International B.V.; Philips Medical Systems Nederland B.V.; Philips Nederland B.V.; Philips Consumer Lifestyle B.V.; Philips Oral Healthcare B.V.,Health & life sciences tech,,workday,https://philips.wd3.myworkdayjobs.com/jobs-and-careers,hand
 Pacmed,Pacmed B.V.,,Health & life sciences tech,,recruitee,pacmed,review
 Medtronic,Medtronic B.V.,Medtronic Bakken Research Center B.V.,Health & life sciences tech,,,,none
 Siemens Healthineers,Siemens Healthineers Nederland B.V.,,Health & life sciences tech,,,,none
@@ -960,10 +960,10 @@ Team6 Game Studios,Team6 Game Studios B.V.,,Gaming & media,,,,none
 Elements Interactive,Elements Interactive B.V.,,Gaming & media,,,,none
 IGT,IGT Europe Gaming B.V.,,Gaming & media,,,,none
 Metrological Media Innovations,Metrological Media Innovations B.V.,,Gaming & media,,,,none
-Elsevier,Elsevier B.V.,,Corporates with tech teams,yes,greenhouse,elsevier,hand
+Elsevier,Elsevier B.V.,,Corporates with tech teams,yes,workday,https://relx.wd3.myworkdayjobs.com/relx,hand
 LexisNexis,LexisNexis Business Information Solutions B.V.,,Corporates with tech teams,,,,none
-LexisNexis Risk Solutions,LNRS Data Services B.V.,,Corporates with tech teams,yes,,,none
-Wolters Kluwer,Wolters Kluwer Global Business Services B.V.,Wolters Kluwer N.V.; Wolters Kluwer Nederland B.V.; Wolters Kluwer Financial Services Netherlands B.V.; Wolters Kluwer TAA Europe Cloud Strategy & Operations C.V.; Wolters Kluwer Tax and Accounting Nederland B.V.,Corporates with tech teams,,,,none
+LexisNexis Risk Solutions,LNRS Data Services B.V.,,Corporates with tech teams,yes,workday,https://relx.wd3.myworkdayjobs.com/RiskSolutions,hand
+Wolters Kluwer,Wolters Kluwer Global Business Services B.V.,Wolters Kluwer N.V.; Wolters Kluwer Nederland B.V.; Wolters Kluwer Financial Services Netherlands B.V.; Wolters Kluwer TAA Europe Cloud Strategy & Operations C.V.; Wolters Kluwer Tax and Accounting Nederland B.V.,Corporates with tech teams,,workday,https://wk.wd3.myworkdayjobs.com/External,hand
 Ahold Delhaize,Ahold Delhaize GSO B.V.,Ahold Delhaize European Business Services B.V.; Koninklijke Ahold Delhaize N.V.,Corporates with tech teams,,,,
 Albert Heijn,Albert Heijn B.V.,Albert Heijn Support B.V.,Corporates with tech teams,,,,none
 VDL Groep (other),VDL Bus & Coach B.V.,VDL Energy Systems B.V.; VDL Enabling Transport Solutions B.V.,Corporates with tech teams,,,,none
