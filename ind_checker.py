@@ -2,12 +2,14 @@
 ind_checker.py — Cross-reference companies against the IND public sponsor register.
 
 The register is scraped from the IND public web page on first run and cached
-locally in data/ind_sponsors.csv. Delete that file to force a refresh.
+locally in data/ind_sponsors.csv, which is redownloaded once it is older than
+REGISTER_MAX_AGE_DAYS. Delete that file to force a refresh.
 
 Source: https://ind.nl/en/public-register-recognised-sponsors/public-register-work
 """
 
 import os
+import time
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -16,6 +18,9 @@ from config import IND_REGISTER_PATH
 IND_REGISTER_WEB_URL = (
     "https://ind.nl/en/public-register-recognised-sponsors/public-register-work"
 )
+
+# The register changes by a few hundred names a month; redownload once the cache is older.
+REGISTER_MAX_AGE_DAYS = 30
 
 
 def _download_register():
@@ -69,11 +74,17 @@ def normalise_name(raw: str) -> str:
     return " ".join(tokens)
 
 
+def _cache_is_stale() -> bool:
+    if not os.path.exists(IND_REGISTER_PATH):
+        return True
+    return time.time() - os.path.getmtime(IND_REGISTER_PATH) > REGISTER_MAX_AGE_DAYS * 86400
+
+
 def load_sponsors() -> set:
     """Return a set of normalised sponsor company names (see normalise_name)."""
-    if not os.path.exists(IND_REGISTER_PATH):
-        names = _download_register()
-    else:
+    names = _download_register() if _cache_is_stale() else []
+    # A failed download falls back to the old cache rather than disabling the check.
+    if not names and os.path.exists(IND_REGISTER_PATH):
         names = pd.read_csv(IND_REGISTER_PATH)["name"].dropna().tolist()
     return {normalise_name(n) for n in names}
 
