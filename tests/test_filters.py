@@ -1,4 +1,4 @@
-from filters import passes_location, passes_exclude
+from filters import names_nl_place, passes_location, passes_exclude
 
 
 # ── passes_location ───────────────────────────
@@ -12,6 +12,19 @@ def test_location_accepts_nl_places():
 def test_location_rejects_countries_containing_nl():
     assert not passes_location("Helsinki, Finland")
     assert not passes_location("Nuuk, Greenland")
+
+
+def test_location_accepts_other_nl_cities():
+    assert passes_location("Veldhoven, Noord-Brabant")
+    assert passes_location("The Hague")
+    assert passes_location("'s-Hertogenbosch")
+    assert passes_location("Eindhoven, nl")
+
+
+def test_nl_place_ignores_work_modes():
+    assert names_nl_place("Remote - Amsterdam")
+    assert not names_nl_place("Remote")
+    assert not names_nl_place("Hybrid")
 
 
 def test_location_rejects_empty():

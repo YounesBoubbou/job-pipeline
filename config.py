@@ -23,7 +23,13 @@ KEYWORDS_EXCLUDE = [
 ]
 
 # ── Location filter ───────────────────────────
-LOCATIONS = ["amsterdam", "netherlands", "nl", "hybrid", "remote", "rotterdam", "utrecht", "den haag"]
+LOCATIONS = [
+    "netherlands", "nederland", "nl", "holland", "hybrid", "remote",
+    "amsterdam", "amstelveen", "diemen", "hoofddorp", "schiphol", "haarlem", "almere", "hilversum",
+    "rotterdam", "den haag", "the hague", "gravenhage", "delft", "leiden", "utrecht", "amersfoort",
+    "eindhoven", "veldhoven", "hertogenbosch", "den bosch", "tilburg", "breda", "nijmegen", "arnhem",
+    "groningen", "enschede", "zwolle", "deventer", "maastricht", "wageningen",
+]
 
 # ── Job board search queries ──────────────────
 # Used by Werkzoeken.nl scraper — edit in scrapers/indeed.py → SEARCH_QUERIES

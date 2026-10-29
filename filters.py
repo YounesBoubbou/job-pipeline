@@ -38,6 +38,12 @@ def passes_exclude(title: str, description: str = "") -> bool:
 # Work modes in LOCATIONS — they say how, not where
 _WORK_MODES = {"remote", "hybrid"}
 
+# True if the location names an NL place (whole word); work modes don't count
+def names_nl_place(location: str) -> bool:
+    loc = location.lower()
+    places = [p.lower() for p in LOCATIONS if p.lower() not in _WORK_MODES]
+    return any(_contains_word(loc, p) for p in places)
+
 # Filter out the jobs based on location
 def passes_location(location: str) -> bool:
     """
@@ -46,11 +52,9 @@ def passes_location(location: str) -> bool:
     """
     if not location:
         return False   # no location means we can't tell it's in the NL
-    loc = location.lower()
-    places = [p.lower() for p in LOCATIONS if p.lower() not in _WORK_MODES]
-    if any(_contains_word(loc, p) for p in places):
+    if names_nl_place(location):
         return True
-    words = set(re.findall(r"[a-z]+", loc))
+    words = set(re.findall(r"[a-z]+", location.lower()))
     return bool(words) and words <= _WORK_MODES | {"job"}
 
 # Return the jobs that pass all of the filtering steps
