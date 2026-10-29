@@ -7,8 +7,10 @@ so a name is never probed twice. Run by hand; each run handles the next batch:
 
     python ats_resolver.py          # next ATS_BATCH_SIZE names
     python ats_resolver.py 20       # next 20 names
+    python ats_resolver.py targets  # fill source/token in targets.csv instead (ADR-0006)
 """
 
+import csv
 import json
 import os
 import re
@@ -18,7 +20,9 @@ import time
 import requests
 
 from config import ATS_MAP_PATH, ATS_BATCH_SIZE
-from ind_checker import load_sponsors
+from filters import names_nl_place
+from ind_checker import load_sponsors, normalise_name
+from scrapers.targets import FETCHERS, TARGETS_PATH, load_targets
 
 HEADERS = {
     "User-Agent": "job-pipeline/1.0 (personal job search; github.com/YounesBoubbou/job-pipeline)"
@@ -61,7 +65,8 @@ def _probe(vendor: str, token: str):
             return is_hit(r)
         except ValueError:  # 200 but not JSON
             return False
-    if r.status_code in (404, 301, 302):
+    # Recruitee answers 403 for some subdomains that have no board (e.g. amazon, factset).
+    if r.status_code in (403, 404, 301, 302):
         return False
     return None  # 429 / 5xx — don't record a miss
 
@@ -99,7 +104,77 @@ def save_map(ats_map: dict):
     os.replace(tmp, ATS_MAP_PATH)
 
 
+def _has_nl_job(vendor: str, token: str) -> bool:
+    """
+    A found board counts only if it lists at least one job in the Netherlands (ADR-0006).
+    A bare "Remote" doesn't count here: it says nothing about which company owns the board.
+    Recruitee demo accounts (accenture, ey) carry "(Sample)" jobs set in Amsterdam, so a
+    board with one is never accepted.
+    """
+    postings = list(FETCHERS[vendor](token))
+    if any("(sample)" in title.lower() for title, _, _, _ in postings):
+        return False
+    return any(names_nl_place(loc) for _, loc, _, _ in postings)
+
+
+def resolve_targets(limit: int = None):
+    """
+    Fill source/token/board_status in targets.csv for rows not probed yet.
+    board_status: 'auto' = board with NL jobs, 'review' = board without NL jobs
+    (possibly another company with the same name), 'none' = no board found.
+    Rows whose probes failed are left blank and retried next run.
+    """
+    rows = load_targets()
+    fields = list(rows[0].keys())
+    for col in ("source", "token", "board_status"):
+        if col not in fields:
+            fields.append(col)
+    pending = [r for r in rows if not r.get("board_status")]
+    todo = pending[:limit]
+    print(f"  {len(rows) - len(pending)}/{len(rows)} targets already probed — probing {len(todo)}...")
+
+    for i, row in enumerate(todo, 1):
+        names = [normalise_name(row["company"]), normalise_name(row["ind_registered_name"])]
+        result, failed = None, False
+        for name in dict.fromkeys(n for n in names if n):
+            result = resolve(name)
+            if result == "error":
+                failed, result = True, None
+            elif result:
+                break
+        if result is None and failed:
+            print(f"  [{i}/{len(todo)}] {row['company']}: request failed, will retry")
+            continue
+        if result is None:
+            row["board_status"] = "none"
+        else:
+            row["source"], row["token"] = result["vendor"], result["token"]
+            try:
+                nl = _has_nl_job(result["vendor"], result["token"])
+            except Exception as e:
+                print(f"  [{i}/{len(todo)}] {row['company']}: board fetch failed ({e}), will retry")
+                row["source"] = row["token"] = ""
+                continue
+            row["board_status"] = "auto" if nl else "review"
+            print(f"  [{i}/{len(todo)}] {row['company']}: {result['vendor']}:{result['token']} {row['board_status']}")
+        _save_targets(rows, fields)  # after every row, so an interrupted run loses nothing
+
+    counts = {s: sum(1 for r in rows if r.get("board_status") == s) for s in ("auto", "review", "none")}
+    print(f"\n  Overall: {counts}, {sum(1 for r in rows if not r.get('board_status'))} not probed yet")
+
+
+def _save_targets(rows: list, fields: list):
+    tmp = TARGETS_PATH + ".tmp"
+    with open(tmp, "w", encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=fields)
+        w.writeheader()
+        w.writerows(rows)
+    os.replace(tmp, TARGETS_PATH)
+
+
 def main():
+    if len(sys.argv) > 1 and sys.argv[1] == "targets":
+        return resolve_targets(int(sys.argv[2]) if len(sys.argv) > 2 else None)
     batch_size = int(sys.argv[1]) if len(sys.argv) > 1 else ATS_BATCH_SIZE
     sponsors = sorted(load_sponsors())
     ats_map = load_map()

@@ -116,7 +116,8 @@ def fetch_target_jobs() -> list[dict]:
 
     for t in load_targets():
         name, source, token = t["company"], t.get("source", "").lower(), t.get("token", "")
-        if source not in FETCHERS or not token:
+        # 'review' rows have a board that may belong to another company (ADR-0006).
+        if source not in FETCHERS or not token or t.get("board_status") == "review":
             skipped.append(name)
             continue
 
