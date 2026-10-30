@@ -1,4 +1,4 @@
-from filters import names_nl_place, passes_language, passes_location, passes_exclude, strip_html
+from filters import names_nl_place, passes_include, passes_language, passes_location, passes_exclude, strip_html
 
 
 # ── passes_location ───────────────────────────
@@ -31,7 +31,40 @@ def test_location_rejects_empty():
     assert not passes_location("")
 
 
+def test_location_rejects_bare_hybrid():
+    assert not passes_location("Hybrid")
+    assert not passes_location("Hybrid; Singapore")
+    assert passes_location("Hybrid; Amsterdam, Netherlands")
+
+
+# ── passes_include ────────────────────────────
+
+def test_include_needs_a_tech_word_in_the_title():
+    assert passes_include("Junior Data Analyst")
+    assert passes_include("AI/ML Engineer")
+    assert passes_include("Medior back-end developer")
+
+
+def test_include_accepts_graduate_and_internship_titles():
+    assert passes_include("Elsevier Netherlands Graduate Program 2027")
+    assert passes_include("Thesis Internship - 2027")
+
+
+def test_include_rejects_seniority_alone_and_partial_words():
+    assert not passes_include("Junior Consultant")
+    assert not passes_include("Traineeship Kinderverpleegkundige")
+    assert not passes_include("Maintenance Planner")   # "ai" inside "Maintenance"
+
+
 # ── passes_exclude ────────────────────────────
+
+def test_exclude_rejects_non_software_engineers_and_sales():
+    assert not passes_exclude("Mechanical Engineer")
+    assert not passes_exclude("Presales Customer Engineer")
+    assert not passes_exclude("Junior Business Developer")
+    assert passes_exclude("Marketing Data Analyst")
+
+
 
 def test_exclude_rejects_seniority():
     assert not passes_exclude("Senior Data Engineer")

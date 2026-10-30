@@ -29,7 +29,11 @@ def _greenhouse(token):
                      headers=HEADERS, timeout=TIMEOUT)
     r.raise_for_status()
     for j in r.json()["jobs"]:
-        yield j["title"], j.get("location", {}).get("name", ""), j["absolute_url"], j.get("content", "")
+        location = j.get("location", {}).get("name", "")
+        # Cloudflare's locations just say "Hybrid"; the actual office is listed separately.
+        if location.strip().lower() == "hybrid":
+            location = "; ".join([location] + [o["name"] for o in j.get("offices", [])])
+        yield j["title"], location, j["absolute_url"], j.get("content", "")
 
 
 def _lever(token):

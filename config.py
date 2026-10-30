@@ -8,18 +8,24 @@ from dotenv import load_dotenv
 load_dotenv()  # loads ANTHROPIC_API_KEY (and any other secrets) from .env, if present
 
 # ── Search terms ──────────────────────────────
+# Whole words in the title. "Junior" alone isn't enough: it let in nurses and marketers.
 KEYWORDS_INCLUDE = [
-    "junior", "graduate", "traineeship", "trainee",
-    "data engineer", "data scientist", "ml engineer",
-    "machine learning engineer", "software engineer",
-    "backend engineer", "python developer", "medior",
-    "data analyst", "analytics engineer", "ai engineer",
+    "engineer", "engineering", "developer", "programmer", "software",
+    "data", "analytics", "scientist", "machine learning", "ml", "ai", "genai",
+    "llm", "llms", "algorithms", "quant", "quantitative", "devops", "sre",
+    "backend", "back end", "frontend", "front end", "fullstack", "full stack",
+    "python", "java", "php",
+    # Entry-level routes that often have no tech word in the title
+    "graduate", "internship",
 ]
 
 # Checked against the title only: descriptions say things like "report to your manager"
 KEYWORDS_EXCLUDE = [
     "senior", "sr", "lead", "principal", "staff", "head of",
     "manager", "director", "vp ", "c-level",
+    # Titles with an include word that still aren't software or data jobs
+    "sales", "presales", "account", "business developer", "writer",
+    "mechanical", "electrical", "electronic", "geotechnical", "material", "wind", "aircraft",
 ]
 
 # Checked against the title and description

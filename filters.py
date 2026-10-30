@@ -21,11 +21,11 @@ _YEARS_REQUIRED = re.compile(
     r"(?<![\d\-–])\b([5-9]|[1-9]\d)\s*(\+|[\-–]\s*\d+)?\s*years?'?\s+(of\s+)?(\w+\s+)?experience"
 )
 
-# Detect if keyword(s) appear in title or description
-def passes_include(title: str, description: str = "") -> bool:
-    """At least one include keyword must appear in title or description."""
-    haystack = _normalise(f"{title} {description}")
-    return any(kw.lower() in haystack for kw in KEYWORDS_INCLUDE)
+# Detect if keyword(s) appear in the title
+def passes_include(title: str) -> bool:
+    """At least one include keyword must appear in the title."""
+    haystack = _normalise(title)
+    return any(_contains_word(haystack, kw.lower()) for kw in KEYWORDS_INCLUDE)
 
 # Filter out the jobs that contain exclude keywords
 def passes_exclude(title: str, description: str = "") -> bool:
@@ -48,15 +48,16 @@ def names_nl_place(location: str) -> bool:
 # Filter out the jobs based on location
 def passes_location(location: str) -> bool:
     """
-    Passes if the location names an NL place (whole word), or is only a work mode
-    like "Remote" — but not "Remote - Indonesia", which can't get you a Dutch visa.
+    Passes if the location names an NL place (whole word), or only says "Remote" —
+    but not "Remote - Indonesia", which can't get you a Dutch visa. A bare "Hybrid"
+    fails: it means an office somewhere, and we don't know where.
     """
     if not location:
         return False   # no location means we can't tell it's in the NL
     if names_nl_place(location):
         return True
     words = set(re.findall(r"[a-z]+", location.lower()))
-    return bool(words) and words <= _WORK_MODES | {"job"}
+    return bool(words) and words <= {"remote", "job"}
 
 # Common words that are unambiguous between the two languages, so not "in", "is", "we" or "of".
 # The Dutch list also has job-title words, because some listings only give us a title.
@@ -87,7 +88,7 @@ def passes_language(title: str, description: str = "") -> bool:
 # Return the jobs that pass all of the filtering steps
 def passes_all(title: str, location: str = "", description: str = "") -> bool:
     return (
-        passes_include(title, description)
+        passes_include(title)
         and passes_exclude(title, description)
         and passes_location(location)
         and passes_language(title, description)
