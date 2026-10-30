@@ -14,6 +14,7 @@ import {
   DEFAULT_FILTERS,
   ROLE_MAP,
   SENIORITY_EXCLUDE,
+  EXPERIENCE_EXCLUDE,
   DUTCH_EXCLUDE,
   EDU_INCLUDE,
 } from '../constants/filters.js'
@@ -33,9 +34,10 @@ function passesFilters(job, filters) {
     if (!matchesRole) return false
   }
 
-  // 2. Seniority — exclude if ANY disqualifying keyword found
+  // 2. Seniority — exclude on a seniority word in the title, or 5+ years anywhere
   if (filters.seniority) {
-    if (SENIORITY_EXCLUDE.some(kw => text.includes(kw))) return false
+    if (SENIORITY_EXCLUDE.some(kw => new RegExp(`\\b${kw}\\b`).test(title))) return false
+    if (EXPERIENCE_EXCLUDE.some(kw => text.includes(kw))) return false
   }
 
   // 3. Language — exclude if any Dutch-required keyword found
