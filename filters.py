@@ -2,9 +2,10 @@
 filters.py — Keyword and location filtering for job postings.
 """
 
+import html
 import re
 
-from config import KEYWORDS_INCLUDE, KEYWORDS_EXCLUDE, LOCATIONS
+from config import KEYWORDS_INCLUDE, KEYWORDS_EXCLUDE, EXPERIENCE_EXCLUDE, LOCATIONS
 
 # Normalise the text first
 def _normalise(text: str) -> str:
@@ -28,11 +29,11 @@ def passes_include(title: str, description: str = "") -> bool:
 
 # Filter out the jobs that contain exclude keywords
 def passes_exclude(title: str, description: str = "") -> bool:
-    """Returns True if NO exclude keyword is found (i.e. job is safe to keep)."""
+    """Returns True if the title has no seniority word and no 5+ years are asked for."""
     text = f"{title} {description}".lower()
-    if _YEARS_REQUIRED.search(text):
+    if _YEARS_REQUIRED.search(text) or any(kw in text for kw in EXPERIENCE_EXCLUDE):
         return False
-    haystack = _normalise(text)
+    haystack = _normalise(title.lower())
     return not any(_contains_word(haystack, kw.lower()) for kw in KEYWORDS_EXCLUDE)
 
 # Work modes in LOCATIONS — they say how, not where
@@ -57,10 +58,37 @@ def passes_location(location: str) -> bool:
     words = set(re.findall(r"[a-z]+", location.lower()))
     return bool(words) and words <= _WORK_MODES | {"job"}
 
+# Common words that are unambiguous between the two languages, so not "in", "is", "we" or "of".
+# The Dutch list also has job-title words, because some listings only give us a title.
+_DUTCH_WORDS = {
+    "de", "het", "een", "en", "van", "voor", "met", "je", "jij", "jouw", "wij", "ons", "onze",
+    "naar", "bij", "zijn", "wordt", "worden", "ook", "die", "dat", "aan", "als", "om", "niet",
+    "ontwikkelaar", "medewerker", "beheerder", "adviseur", "monteur", "stagiair",
+    "afstudeerstage", "werkstudent", "vacature",
+}
+_ENGLISH_WORDS = {
+    "the", "and", "to", "with", "for", "you", "your", "our", "are", "will", "this", "that",
+    "from", "have",
+}
+
+# Boards send descriptions as HTML, some of it escaped; a cut-off final tag is removed too
+def strip_html(text: str) -> str:
+    text = re.sub(r"<[^>]*(>|$)", " ", html.unescape(text))
+    return " ".join(html.unescape(text).split())
+
+# Filter out the jobs written in Dutch; a tie (e.g. the title "Data Engineer") is kept
+def passes_language(title: str, description: str = "") -> bool:
+    """Returns True unless the posting has more Dutch words than English ones."""
+    words = re.findall(r"[a-zà-ÿ]+", strip_html(f"{title} {description}").lower())
+    dutch = sum(w in _DUTCH_WORDS for w in words)
+    english = sum(w in _ENGLISH_WORDS for w in words)
+    return dutch <= english
+
 # Return the jobs that pass all of the filtering steps
 def passes_all(title: str, location: str = "", description: str = "") -> bool:
     return (
         passes_include(title, description)
         and passes_exclude(title, description)
         and passes_location(location)
+        and passes_language(title, description)
     )

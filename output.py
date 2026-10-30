@@ -96,9 +96,8 @@ def write_sheets(jobs: list[dict]):
         if not sheet.row_values(1):
             sheet.insert_row(COLUMNS, index=1)
 
-        for job in jobs:
-            row = [job.get(col, "") for col in COLUMNS]
-            sheet.append_row(row)
+        # One request for all rows: Sheets allows ~60 writes a minute, so a big run would fail per-row
+        sheet.append_rows([[job.get(col, "") for col in COLUMNS] for job in jobs])
 
         print(f"  Google Sheets updated (+{len(jobs)} rows)")
 

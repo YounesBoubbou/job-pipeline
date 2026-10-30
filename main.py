@@ -11,7 +11,7 @@ from datetime import datetime
 from scrapers.indeed import fetch_indeed_jobs
 from scrapers.company_pages import fetch_company_jobs
 from scrapers.targets import fetch_target_jobs
-from ind_checker import is_ind_sponsor
+from ind_checker import job_sponsor_status
 from output import load_seen, save_seen, deduplicate, write_csv, write_sheets
 
 
@@ -47,8 +47,7 @@ def run():
     # ── 3. Enrich with IND sponsor status ─────────────────
     print("\n[4/4] Checking IND sponsor register...")
     for job in new_jobs:
-        company = job.get("company", "")
-        job["ind_sponsor"] = is_ind_sponsor(company) if company else "Unknown"
+        job["ind_sponsor"] = job_sponsor_status(job)
 
     # Summary
     yes_count     = sum(1 for j in new_jobs if j["ind_sponsor"] == "Yes")

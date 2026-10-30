@@ -105,3 +105,9 @@ def is_ind_sponsor(company_name: str) -> str:
     if not _SPONSORS:
         return "Unknown"
     return "Yes" if normalise_name(company_name) in _SPONSORS else "No"
+
+
+def job_sponsor_status(job: dict) -> str:
+    """Target-list jobs carry their registered name; 'Jump Trading' alone wouldn't match."""
+    name = job.get("ind_registered_name") or job.get("company", "")
+    return is_ind_sponsor(name) if name else "Unknown"

@@ -14,7 +14,7 @@ from datetime import datetime
 
 import requests
 
-from filters import passes_all
+from filters import passes_all, strip_html
 
 TARGETS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "targets.csv")
 HEADERS = {"User-Agent": "job-pipeline (personal job search)"}
@@ -53,7 +53,9 @@ def _recruitee(token):
     r = requests.get(f"https://{token}.recruitee.com/api/offers/", headers=HEADERS, timeout=TIMEOUT)
     r.raise_for_status()
     for j in r.json()["offers"]:
-        yield j["title"], j.get("location", ""), j["careers_url"], j.get("description", "")
+        # Some boards leave `description` as "-" and put all the text in `requirements`.
+        description = f"{j.get('description', '')} {j.get('requirements', '')}"
+        yield j["title"], j.get("location", ""), j["careers_url"], description
 
 
 def _smartrecruiters(token):
@@ -111,6 +113,37 @@ def _workday_locations(detail_url):
     return "; ".join([info.get("location", "")] + info.get("additionalLocations", []))
 
 
+# Workday and SmartRecruiters listings carry no description, so it takes one request per job.
+# On failure these return "", which leaves only the title for the filters to judge.
+
+def _workday_description(token, url):
+    base = token.rstrip("/")
+    host, site = base.rsplit("/", 1)
+    tenant = host.split("//")[1].split(".")[0]
+    try:
+        r = requests.get(f"{host}/wday/cxs/{tenant}/{site}{url[len(base):]}", headers=HEADERS, timeout=TIMEOUT)
+        r.raise_for_status()
+        return r.json()["jobPostingInfo"].get("jobDescription", "")
+    except Exception:
+        return ""
+
+
+def _smartrecruiters_description(token, url):
+    try:
+        r = requests.get(f"https://api.smartrecruiters.com/v1/companies/{token}/postings/{url.rsplit('/', 1)[1]}",
+                         headers=HEADERS, timeout=TIMEOUT)
+        r.raise_for_status()
+        sections = r.json()["jobAd"]["sections"]
+        return " ".join(s.get("text", "") for s in sections.values())
+    except Exception:
+        return ""
+
+
+DESCRIPTION_FETCHERS = {
+    "workday":         _workday_description,
+    "smartrecruiters": _smartrecruiters_description,
+}
+
 FETCHERS = {
     "greenhouse":      _greenhouse,
     "lever":           _lever,
@@ -148,15 +181,21 @@ def fetch_target_jobs() -> list[dict]:
         for title, location, url, description in postings:
             if not passes_all(title, location, description):
                 continue
+            # Only fetched for jobs that got this far, to keep the request count down.
+            if not description and source in DESCRIPTION_FETCHERS:
+                description = DESCRIPTION_FETCHERS[source](token, url)
+                if not passes_all(title, location, description):
+                    continue
             kept += 1
             jobs.append({
                 "title":               title,
                 "company":             name,
+                "ind_registered_name": t.get("ind_registered_name", ""),
                 "location":            location,
                 "url":                 url,
                 "source":              f"Target ({source})",
                 "date_found":          TODAY,
-                "description_snippet": description[:300],
+                "description_snippet": strip_html(description)[:300],
             })
         print(f"  {name} ({source}): {len(postings)} listings, {kept} kept")
 

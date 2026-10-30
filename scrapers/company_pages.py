@@ -10,7 +10,7 @@ Two strategies:
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
-from filters import passes_all
+from filters import passes_all, strip_html
 from config import COMPANY_PAGES
 
 HEADERS = {
@@ -105,7 +105,7 @@ def _fetch_greenhouse(company_name: str, gh_slug: str) -> list[dict]:
                 "url":                 href,
                 "source":              f"Careers ({company_name})",
                 "date_found":          TODAY,
-                "description_snippet": content[:300],
+                "description_snippet": strip_html(content),
             })
 
     except Exception as e:

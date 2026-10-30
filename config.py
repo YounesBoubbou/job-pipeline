@@ -16,11 +16,14 @@ KEYWORDS_INCLUDE = [
     "data analyst", "analytics engineer", "ai engineer",
 ]
 
+# Checked against the title only: descriptions say things like "report to your manager"
 KEYWORDS_EXCLUDE = [
-    "senior", "lead", "principal", "staff", "head of",
-    "manager", "director", "vp ", "5+ years", "7+ years",
-    "10+ years", "c-level",
+    "senior", "sr", "lead", "principal", "staff", "head of",
+    "manager", "director", "vp ", "c-level",
 ]
+
+# Checked against the title and description
+EXPERIENCE_EXCLUDE = ["5+ years", "7+ years", "10+ years"]
 
 # ── Location filter ───────────────────────────
 LOCATIONS = [

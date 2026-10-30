@@ -7,7 +7,7 @@ Sources:
 
 import requests
 from datetime import datetime
-from filters import passes_all
+from filters import passes_all, strip_html
 
 HEADERS = {
     "User-Agent": (
@@ -58,7 +58,7 @@ def _fetch_remoteok() -> list[dict]:
                 "url":                 href,
                 "source":              "RemoteOK",
                 "date_found":          TODAY,
-                "description_snippet": description,
+                "description_snippet": strip_html(description),
             })
 
         print(f"    RemoteOK: {len(jobs)} matching jobs")
@@ -111,7 +111,7 @@ def _fetch_arbeitnow() -> list[dict]:
                     "url":                 href,
                     "source":              "Arbeitnow",
                     "date_found":          TODAY,
-                    "description_snippet": description,
+                    "description_snippet": strip_html(description),
                 })
 
         print(f"    Arbeitnow: {len(jobs)} matching jobs")
