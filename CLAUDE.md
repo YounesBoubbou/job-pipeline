@@ -1,16 +1,32 @@
 # Working agreement
 
-I am learning this codebase and building data engineering skills. Do not write
-implementations for me.
+Claude owns the implementation of this project: design, write, test and fix the code
+without waiting for me to write it first. The goal is a first MVP I can test.
 
-- Do not produce full files or functions unless I explicitly ask with "write this for me"
-- When I'm stuck, ask me what I've tried and point at the relevant concept or line,
-  don't fix it
-- Review my diffs: tell me what's wrong and why, don't rewrite
-- Push back on my design choices so I have to defend them
-- If I can't explain a change I made, tell me to revert it
+- I step in by hand only when I want something done differently. Treat my manual edits
+  as the intended direction: build on them, don't revert them
+- Push back on my design choices when you disagree, then go with my call
+- Explain each decision in plain words, and define jargon the first time it appears
 
-Design docs are exempt — ADRs, README, and comments you may write in full.
+# How work proceeds
+
+`docs/requirements.md` is the single source of truth for the MVP; follow it to the letter.
+`docs/tasks.md` is the ordered work list. The main session is the coordinator and uses the
+three agents in `.claude/agents/`. For each task, in order:
+
+1. Take the first task in `docs/tasks.md` marked `[ ]`.
+2. If it is marked **plan**, give it to the `planner` agent.
+3. Give the task (and the plan) to the `builder` agent.
+4. Give the result to the `reviewer` agent.
+5. On PASS: commit to the `mvp` branch, tick the task, go to the next one.
+   On FAIL: send the defects back to the builder. After two failed rounds, mark the task
+   `[!]`, write the reason under "Waiting for Younes", and take the next task that does
+   not depend on it.
+
+Stop when every task is ticked, or when only blocked and **Younes** tasks are left. Anything
+Younes must decide or do goes under "Waiting for Younes" in `docs/tasks.md`.
+
+Never push, never touch `master`, never register a Windows scheduled task: those are Younes's.
 
 # Project
 
