@@ -59,7 +59,7 @@ cannot be finished without him.
   New `run_daily.ps1` that runs the pipeline and keeps a log. Write the exact command that
   registers the task for weekdays at 08:00, but do not run it: list it below for Younes.
 - [x] **18. Documentation** (Q5). `README.md` and the "Project" section of `CLAUDE.md`.
-- [ ] **19. Final report.** `docs/mvp-report.md`: every requirement, its check, pass or fail.
+- [x] **19. Final report.** `docs/mvp-report.md`: every requirement, its check, pass or fail.
 
 ## Waiting for Younes
 
