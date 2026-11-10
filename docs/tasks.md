@@ -20,7 +20,8 @@ cannot be finished without him.
   Files: `output.py` (`deduplicate`, `_posting_key`). Test: one job from both sources ends
   as one row labelled `Yes`.
 - [x] **4. Test: a second run adds nothing** (P3). Files: `tests/test_output.py`.
-- [ ] **5. Valtech board** (P5). Its Greenhouse token returns "not found". Find the right
+- [x] **5. Valtech board** (P5). *Done 2026-11-10: the existing row works again (130 listings, 2 in
+  Utrecht); no change needed. If it fails again it shows under `failed` in the run summary.* Its Greenhouse token returns "not found". Find the right
   board and fix the row in `targets.csv`, or leave it failing and visible in the summary.
 - [ ] **6. Workday speed** (P6). **plan**
   Files: `scrapers/targets.py` (`_workday`). Ask each Workday board for Netherlands jobs
