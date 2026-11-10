@@ -81,6 +81,12 @@ export default function JobCard({ job, onApply }) {
 
         {/* Badges */}
         <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+          {/* W3: added by the most recent pipeline run */}
+          {job.is_new && (
+            <Badge className="bg-amber-100 text-amber-800 border-amber-300" title="Added by the last run">
+              New
+            </Badge>
+          )}
           <Badge className={indColor}>
             IND {job.ind_sponsor || 'Unknown'}
           </Badge>
@@ -194,9 +200,9 @@ function ResultPanel({ state, onClose }) {
   )
 }
 
-function Badge({ className, children }) {
+function Badge({ className, title, children }) {
   return (
-    <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${className}`}>
+    <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${className}`} title={title}>
       {children}
     </span>
   )

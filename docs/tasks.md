@@ -43,10 +43,12 @@ cannot be finished without him.
   New `start.ps1`; `frontend/vite.config.js` (listen on the network, not only this PC);
   `api.py` if needed. The script prints the address to open on the phone.
 - [x] **11. Last run status** (W8). Files: `api.py`, `frontend/src/App.jsx`.
-- [ ] **12. Mark new jobs** (W3). **plan** Files: `api.py`, `frontend/src/components/JobCard.jsx`.
+- [x] **12. Mark new jobs** (W3). **plan** Files: `api.py`, `frontend/src/components/JobCard.jsx`.
 - [ ] **13. Sponsors-only on by default; card shows all required fields** (W2, W4).
   Files: `frontend/src/constants/filters.js`, `frontend/src/components/JobCard.jsx`.
-- [ ] **14. Phone layout** (W6). Files: `JobBrowser.jsx`, `FilterBar.jsx`, `Tracker.jsx`.
+- [ ] **14. Phone layout** (W6). Files: `JobBrowser.jsx`, `FilterBar.jsx`, `Tracker.jsx`, `JobCard.jsx`.
+  Found in task 12: job cards overflow sideways at every width, desktop too; the badge row in
+  `JobCard.jsx` (`shrink-0 flex-wrap`, ~line 83) never shrinks so never wraps. Fix for all widths.
   Check both pages at 375 pixels wide and save screenshots to `docs/screenshots/`.
 - [ ] **15. Tracker check** (W5). Mark a job as applied, reload, confirm. Fix what fails.
 

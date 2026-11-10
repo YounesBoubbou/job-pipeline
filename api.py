@@ -80,30 +80,62 @@ def _get_tracker_sheet():
         return ws
 
 
+# ── Run summary helpers ────────────────────────────────────────────────────────
+
+def _read_summary():
+    """Read data/last_run.json. Returns (summary, None) or (None, message) when the
+    file is missing, unreadable or not a JSON object."""
+    if not os.path.exists(SUMMARY_PATH):
+        return None, "The pipeline has not run yet (no run summary file)."
+    try:
+        with open(SUMMARY_PATH, encoding="utf-8") as f:
+            summary = json.load(f)
+    except (OSError, ValueError) as exc:
+        return None, f"The run summary file could not be read: {exc}"
+    if not isinstance(summary, dict):
+        return None, "The run summary file could not be read: not a JSON object."
+    return summary, None
+
+
+def _last_run_added_count():
+    """How many jobs the last run added (its jobs_added), or 0 when that is unknown:
+    no or unreadable summary, or jobs_added missing, not a whole number, or negative."""
+    summary, _ = _read_summary()
+    if summary is None:
+        return 0
+    added = summary.get("jobs_added")
+    if isinstance(added, bool) or not isinstance(added, int) or added < 0:
+        return 0
+    return added
+
+
 # ── Endpoints ──────────────────────────────────────────────────────────────────
 
 @app.get("/api/jobs")
 def get_jobs():
-    """Return all jobs from data/jobs.csv as JSON (column names preserved)."""
+    """Return all jobs from data/jobs.csv as JSON (column names preserved).
+
+    Each job also gets is_new (W3): True for the jobs added by the most recent run.
+    jobs.csv is append-only, so those are its last jobs_added rows (ADR 0011). If that
+    count is unknown or larger than the file, no job is marked."""
     if not os.path.exists(CSV_PATH):
         return []
     df = pd.read_csv(CSV_PATH, dtype=str).fillna("")
-    return df.to_dict(orient="records")
+    jobs = df.to_dict(orient="records")
+    added = _last_run_added_count()
+    first_new = len(jobs) - added if 0 < added <= len(jobs) else len(jobs)
+    for i, job in enumerate(jobs):
+        job["is_new"] = i >= first_new
+    return jobs
 
 
 @app.get("/api/last-run")
 def get_last_run():
     """Return the summary of the last pipeline run (W8), read from data/last_run.json.
     A missing or unreadable file is not an error: the app shows the message instead."""
-    if not os.path.exists(SUMMARY_PATH):
-        return {"found": False, "message": "The pipeline has not run yet (no run summary file)."}
-    try:
-        with open(SUMMARY_PATH, encoding="utf-8") as f:
-            summary = json.load(f)
-    except (OSError, ValueError) as exc:
-        return {"found": False, "message": f"The run summary file could not be read: {exc}"}
-    if not isinstance(summary, dict):
-        return {"found": False, "message": "The run summary file could not be read: not a JSON object."}
+    summary, message = _read_summary()
+    if summary is None:
+        return {"found": False, "message": message}
     return {"found": True, "summary": summary}
 
 
