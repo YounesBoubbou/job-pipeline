@@ -172,3 +172,76 @@ def test_jobs_keeps_list_shape(csv_path, summary_path):
     assert isinstance(body, list)
     assert len(body) == 3
     assert body[0]["title"] == "a job 0"
+
+
+# ── Application tracker (W5) ───────────────────────────────────────────────────
+
+class FakeCell:
+    def __init__(self, row):
+        self.row = row
+
+
+class FakeSheet:
+    """Stands in for the gspread Applications worksheet: a header row plus data rows."""
+
+    def __init__(self, rows=()):
+        self.values = [list(api.TRACKER_COLUMNS)] + [list(r) for r in rows]
+
+    def get_all_records(self):
+        return [dict(zip(self.values[0], r)) for r in self.values[1:]]
+
+    def append_row(self, row):
+        self.values.append(list(row))
+
+    def find(self, query):
+        for i, r in enumerate(self.values):
+            if query in r:
+                return FakeCell(i + 1)
+        return None
+
+    def update_cell(self, row, col, value):
+        self.values[row - 1][col - 1] = value
+
+
+ADYEN = ["Compliance Data Analyst", "Adyen", "https://example.com/adyen/1", "2026-05-21", "Applied"]
+
+
+@pytest.fixture
+def sheet(monkeypatch):
+    fake = FakeSheet([ADYEN])
+    monkeypatch.setattr(api, "_get_tracker_sheet", lambda: fake)
+    return fake
+
+
+def test_tracker_mark_applied_then_reload(sheet):
+    entry = {"title": "Engineer", "company": "Booking.com", "url": "https://example.com/booking/2",
+             "date_applied": "2026-11-10", "status": "Applied"}
+    assert client.post("/api/tracker", json=entry).json() == {"ok": True}
+    # A fresh page load reads the tracker back: both the old and the new application are there
+    assert client.get("/api/tracker").json() == [dict(zip(api.TRACKER_COLUMNS, ADYEN)), entry]
+
+
+def test_tracker_status_defaults_to_applied(sheet):
+    client.post("/api/tracker", json={"title": "T", "company": "C", "url": "https://example.com/3",
+                                      "date_applied": "2026-11-10"})
+    assert sheet.values[-1][-1] == "Applied"
+
+
+def test_tracker_status_change_updates_only_that_row(sheet):
+    client.post("/api/tracker", json={"title": "T", "company": "C", "url": "https://example.com/3",
+                                      "date_applied": "2026-11-10"})
+    res = client.patch("/api/tracker/status", json={"url": "https://example.com/3", "status": "Got interview"})
+    assert res.json() == {"ok": True}
+    statuses = {r["url"]: r["status"] for r in client.get("/api/tracker").json()}
+    assert statuses == {"https://example.com/adyen/1": "Applied", "https://example.com/3": "Got interview"}
+
+
+def test_tracker_sheet_unreachable_returns_503(monkeypatch):
+    # The frontend falls back to browser storage when it sees a non-OK answer
+    def broken():
+        raise FileNotFoundError("credentials.json not found")
+    monkeypatch.setattr(api, "_get_tracker_sheet", broken)
+    assert client.get("/api/tracker").status_code == 503
+    entry = {"title": "T", "company": "C", "url": "u", "date_applied": "2026-11-10"}
+    assert client.post("/api/tracker", json=entry).status_code == 503
+    assert client.patch("/api/tracker/status", json={"url": "u", "status": "Rejected"}).status_code == 503

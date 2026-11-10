@@ -50,7 +50,7 @@ cannot be finished without him.
   Found in task 12: job cards overflow sideways at every width, desktop too; the badge row in
   `JobCard.jsx` (`shrink-0 flex-wrap`, ~line 83) never shrinks so never wraps. Fix for all widths.
   Check both pages at 375 pixels wide and save screenshots to `docs/screenshots/`.
-- [ ] **15. Tracker check** (W5). Mark a job as applied, reload, confirm. Fix what fails.
+- [x] **15. Tracker check** (W5). Mark a job as applied, reload, confirm. Fix what fails.
 
 ## Wrap-up
 
@@ -113,3 +113,8 @@ cannot be finished without him.
   Wi-Fi, and check the job list loads. If it doesn't, run once in an administrator PowerShell:
   `New-NetFirewallRule -DisplayName "Job pipeline web app (5173)" -Direction Inbound -Protocol TCP -LocalPort 5173 -Action Allow -Profile Private,Public`
   (or set the home Wi-Fi to Private in Windows and use `-Profile Private` only). Then tick task 10.
+- **FYI from task 15 (W5 passes; not blocking).** (a) A job marked applied between 00:00 and 01:00
+  Dutch time (02:00 in summer) gets yesterday's date, because `TrackerContext.jsx` line 72 takes
+  the UTC date. One-line fix; say if you want it. (b) There is no way to remove an application
+  from the tracker, in the app or the API. The live test row was removed directly in the Sheet,
+  which now matches its earlier state.
