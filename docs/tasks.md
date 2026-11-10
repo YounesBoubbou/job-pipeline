@@ -58,7 +58,7 @@ cannot be finished without him.
 - [!] **17. Windows scheduled task** (P8). **Younes**
   New `run_daily.ps1` that runs the pipeline and keeps a log. Write the exact command that
   registers the task for weekdays at 08:00, but do not run it: list it below for Younes.
-- [ ] **18. Documentation** (Q5). `README.md` and the "Project" section of `CLAUDE.md`.
+- [x] **18. Documentation** (Q5). `README.md` and the "Project" section of `CLAUDE.md`.
 - [ ] **19. Final report.** `docs/mvp-report.md`: every requirement, its check, pass or fail.
 
 ## Waiting for Younes
@@ -149,3 +149,10 @@ cannot be finished without him.
     needed. If the PC was off or asleep at 08:00 it runs as soon as it's back; it won't wake the PC.
   - P8's check: the next weekday after 08:00, `data\last_run.json` has that morning's
     `started_at` and a new `logs\run_<date>_HHmm.log` ends in `exit code 0`, with no manual run.
+- **FYI from task 18 (not blocking).** (a) `README.md` points to the "Task 17" item above for the
+  scheduled-task command; once you've registered it and remove that item, move the command into
+  the README. (b) Small code/doc leftovers, untouched because task 18 was docs only: unused
+  `IND_REGISTER_URL` and stale comments in `config.py`; `main.py` prints "Fetching jobs from
+  Indeed RSS..." but fetches RemoteOK and Arbeitnow; ADR-0005 mentions a `url` source kind that
+  doesn't exist; two `targets.csv` rows (Ncardia, Tech Rise People) have a blank status. Say if
+  you want them cleaned up.

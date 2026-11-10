@@ -30,11 +30,18 @@ Never push, never touch `master`, never register a Windows scheduled task: those
 
 # Project
 
-Daily job discovery pipeline. Starts from the IND recognised sponsor register, resolves
-sponsors to their job boards, and fetches openings. Aggregator scrapers (RemoteOK,
-Arbeitnow, Greenhouse) run alongside as a secondary source.
+Daily job discovery pipeline plus a web app. The main source is `targets.csv`, a
+hand-reviewed list of 1,045 IND recognised sponsors, 186 of them with a job board that is
+fetched daily (ADR-0005, ADR-0006) by 12 source kinds in `scrapers/targets.py`. Job-board sites (RemoteOK,
+Arbeitnow) and a few company pages (Adyen, Catawiki, Booking.com, SURF) run alongside.
 
-Current: 6 Python files, CSV + Google Sheets output, pytest tests in `tests/` (run `python -m pytest`), GitHub Actions daily.
+Current: 13 Python modules (9 at the root, 4 in `scrapers/`; the CV and cover-letter
+generators are outside the MVP) and 10 test files in `tests/` (run
+`venv\Scripts\python.exe -m pytest`). Jobs go to `data/jobs.csv` only, with a run summary
+in `data/last_run.json`; the Google Sheet holds only the application tracker. Runs on
+Younes's PC each weekday at 08:00 via a Windows scheduled task (`run_daily.ps1`, logs in
+`logs/`). Web app: FastAPI (`api.py`) + React/Vite (`frontend/`), started by `start.ps1`,
+reachable from a phone on the home Wi-Fi. GitHub Actions runs the tests only.
 Target: hardened extraction, CI gates, orchestration.
 
 # Conventions
