@@ -112,6 +112,21 @@ def test_exclude_rejects_three_or_more_years():
         "min. 4 yrs working with SQL",
         "At least five years of experience",
         "(3+ years) of professional experience",
+        "3 years’ experience",
+        "3 years’ relevant experience",
+        "3 or more years of experience",
+        "Three or more years of experience",
+        "3 or more years",
+        "Three (3) years of experience",
+        "At least three (3) years",
+        "3-5 years",
+        "5–7 yrs",
+        "3+ yrs",
+        "3 + years",
+        "min 3 yrs",
+        "Over 3 years of experience",
+        "3 years hands-on experience",
+        "1-2 years; 3+ years is a plus",
     ]:
         assert not passes_exclude("Data Engineer", text), text
 
@@ -130,6 +145,16 @@ def test_exclude_keeps_junior_year_requirements():
         "Over the next 3 years you will grow into the role",
         "A 3 year contract",
         "Founded 30 years ago",
+        "2 - 3 years of experience",
+        "2 – 3 years of experience",
+        "1.5 years of experience",
+        "Less than 3 years of experience",
+        "2+ years’ experience",
+        "0–3 years of experience",
+        "Up to 3 years of experience",
+        "A 3-year contract",
+        "30 years of history",
+        "3 days a week, 2 years of experience",
     ]:
         assert passes_exclude("Data Engineer", text), text
 
