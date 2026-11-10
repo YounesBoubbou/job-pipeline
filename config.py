@@ -28,8 +28,8 @@ KEYWORDS_EXCLUDE = [
     "mechanical", "electrical", "electronic", "geotechnical", "material", "wind", "aircraft",
 ]
 
-# Checked against the title and description
-EXPERIENCE_EXCLUDE = ["5+ years", "7+ years", "10+ years"]
+# Checked against the title and description, on top of the "3 or more years" pattern in filters.py
+EXPERIENCE_EXCLUDE = ["3+ years", "4+ years", "5+ years", "7+ years", "10+ years"]
 
 # ── Location filter ───────────────────────────
 LOCATIONS = [

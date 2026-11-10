@@ -15,10 +15,23 @@ def _normalise(text: str) -> str:
 def _contains_word(haystack: str, word: str) -> bool:
     return re.search(rf"\b{re.escape(word.strip())}\b", haystack) is not None
 
-# "5+ years", "5-7 years", "at least 6 years" of experience — 5 or more, not "3-5 years".
-# Needs "experience" after it, so "building software for 20 years" doesn't count.
+# Asking for 3 or more years of experience: "3+ years", "3-5 years of experience",
+# "at least three years", "minimum of 4 yrs", "5 years' relevant experience".
+# A range counts by its lower end, so "2-3 years" and "2 to 3 years" are kept.
+# A bare number needs "experience" close after it, or "at least"/"minimum" before it,
+# so "building software for 20 years" doesn't count.
+_NUM = (r"(?:[3-9]|[1-9]\d|three|four|five|six|seven|eight|nine|ten|eleven|twelve"
+        r"|fifteen|twenty)")
+_YRS = r"(?:years?|yrs?)\b'?"
+_NOT_RANGE_END = r"(?<![\d\-–])(?<!to\s)(?<!or\s)\b"
+_RANGE = r"(?:\s*(?:[\-–]|to)\s*(?:\d+|[a-z]+))?"
 _YEARS_REQUIRED = re.compile(
-    r"(?<![\d\-–])\b([5-9]|[1-9]\d)\s*(\+|[\-–]\s*\d+)?\s*years?'?\s+(of\s+)?(\w+\s+)?experience"
+    # "3+ years", "5 plus years": a plus always means a minimum
+    rf"{_NOT_RANGE_END}{_NUM}\s*(?:\+|plus)\s*{_YRS}"
+    # "3 years of experience", "3-5 years relevant experience", "4 yrs' hands-on experience"
+    rf"|{_NOT_RANGE_END}{_NUM}{_RANGE}\s*{_YRS}\s+(?:of\s+)?(?:\S+\s+){{0,2}}?experience"
+    # "at least 3 years", "minimum of three years", "min. 4 yrs"
+    rf"|\b(?:at\s+least|minimum(?:\s+of)?|min\.?)\s+{_NUM}{_RANGE}\s*(?:\+\s*)?{_YRS}"
 )
 
 # Detect if keyword(s) appear in the title
@@ -29,7 +42,7 @@ def passes_include(title: str) -> bool:
 
 # Filter out the jobs that contain exclude keywords
 def passes_exclude(title: str, description: str = "") -> bool:
-    """Returns True if the title has no seniority word and no 5+ years are asked for."""
+    """Returns True if the title has no seniority word and no 3+ years are asked for."""
     text = f"{title} {description}".lower()
     if _YEARS_REQUIRED.search(text) or any(kw in text for kw in EXPERIENCE_EXCLUDE):
         return False

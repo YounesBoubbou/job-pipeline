@@ -128,7 +128,7 @@ The phone works only on the home Wi-Fi, while the PC is on and `start.ps1` is ru
   | Filter | Default | What it does |
   |---|---|---|
   | Role type | none picked | Show only AI Engineer / Software Engineer / Data Scientist / Data Engineer / ML Engineer |
-  | Entry-level only | on | Hides titles with senior, sr, lead, principal, staff, head of, manager or director, and jobs asking 5+, 7+ or 10+ years |
+  | Entry-level only | on | Hides titles with senior, sr, lead, principal, staff, head of, manager or director, and jobs asking 3 or more years (e.g. 3+, 3-5, "at least three") |
   | No Dutch required | on | Hides jobs mentioning dutch, nederlands, fluent in Dutch or native Dutch |
   | IND sponsors | **on** | Shows only jobs labelled `Yes` |
   | MSc-friendly | off | Shows only jobs mentioning master, MSc or M.Sc |
@@ -254,7 +254,7 @@ When the same job comes from the target list and one of these, the target-list c
 ### Filters
 
 A job is kept only if it passes all four rules in `filters.py` (word lists in `config.py`):
-a tech word in the title; no seniority word in the title and no 5+ years asked; a Dutch
+a tech word in the title; no seniority word in the title and no 3+ years asked; a Dutch
 place in the location, or plain "Remote"; and not written mostly in Dutch.
 
 ### Sponsor label

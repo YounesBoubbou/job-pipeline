@@ -95,10 +95,43 @@ def test_exclude_rejects_year_requirements():
     assert not passes_exclude("Data Engineer", "At least 6 years experience")
 
 
+def test_exclude_rejects_three_or_more_years():
+    # Younes, 2026-11-10: more than 2 years asked is out of reach, so 3+ is excluded.
+    for text in [
+        "3+ years of experience",
+        "You have 3 years of experience with Python",
+        "3-5 years of experience",
+        "3 to 5 years of experience",
+        "4 years experience",
+        "3 years' relevant experience",
+        "3 yrs of hands-on experience",
+        "Requirements: 3+ years in Python",
+        "5 plus years in data engineering",
+        "At least 3 years in a similar role",
+        "Minimum of three years in software development",
+        "min. 4 yrs working with SQL",
+        "At least five years of experience",
+        "(3+ years) of professional experience",
+    ]:
+        assert not passes_exclude("Data Engineer", text), text
+
+
 def test_exclude_keeps_junior_year_requirements():
-    assert passes_exclude("Data Engineer", "1-2 years of experience")
-    assert passes_exclude("Data Engineer", "3-5 years of experience")
-    assert passes_exclude("Data Engineer", "We have been building software for 20 years")
+    for text in [
+        "1-2 years of experience",
+        "0-2 years of experience",
+        "2 years of experience",
+        "2+ years of experience",
+        "2-3 years of experience",
+        "2 to 3 years of experience",
+        "2 or 3 years of experience",
+        "At least 2 years in a similar role",
+        "We have been building software for 20 years",
+        "Over the next 3 years you will grow into the role",
+        "A 3 year contract",
+        "Founded 30 years ago",
+    ]:
+        assert passes_exclude("Data Engineer", text), text
 
 
 def test_location_accepts_bare_work_mode():
