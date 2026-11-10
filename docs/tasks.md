@@ -23,7 +23,7 @@ cannot be finished without him.
 - [x] **5. Valtech board** (P5). *Done 2026-11-10: the existing row works again (130 listings, 2 in
   Utrecht); no change needed. If it fails again it shows under `failed` in the run summary.* Its Greenhouse token returns "not found". Find the right
   board and fix the row in `targets.csv`, or leave it failing and visible in the summary.
-- [ ] **6. Workday speed** (P6). **plan**
+- [x] **6. Workday speed** (P6). **plan**
   Files: `scrapers/targets.py` (`_workday`). Ask each Workday board for Netherlands jobs
   only instead of downloading every listing. Check each of the 22 boards still returns its
   Dutch jobs afterwards.
@@ -68,3 +68,9 @@ cannot be finished without him.
   board on an earlier day keeps its `No` label when the target list later finds it, because P3
   forbids re-adding it. Same if a target board fails on the day a job board lists the job. Say if
   you want old rows relabelled.
+- **NXP's Workday board is down (found in task 6).** Its careers page returns 500 and the jobs API
+  returns 422, before any change of ours. It shows under `failed` in the run summary, which meets
+  P5. Say if you want its new board looked up (that means editing `targets.csv`).
+- **ADR-0008 sign-off (task 6).** Workday boards are now asked for Netherlands jobs only, so for
+  them "fetched" counts the board's Dutch listings, not every listing worldwide. Confirm this
+  server-side country filter does not count as "filtering" for P9's "at least one job fetched".

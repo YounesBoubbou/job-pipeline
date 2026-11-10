@@ -14,7 +14,7 @@ from datetime import datetime
 
 import requests
 
-from filters import passes_all, strip_html
+from filters import names_nl_place, passes_all, strip_html
 
 TARGETS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "targets.csv")
 HEADERS = {"User-Agent": "job-pipeline (personal job search)"}
@@ -81,30 +81,83 @@ def _smartrecruiters(token):
 def _workday(token):
     # Token is the public board URL, e.g. https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite
     # The listing API lives at /wday/cxs/{tenant}/{site}/jobs and caps pages at 20.
-    # It reports `total` only on the first page (later pages say 0), so read it once.
+    # Downloading every listing took most of an hour across all boards (P6), so the first
+    # page's facets (the board's own search filters) are used to ask for Netherlands jobs
+    # only (ADR-0008). Boards whose filters can't be read are still downloaded in full.
     base = token.rstrip("/")
     host, site = base.rsplit("/", 1)
     tenant = host.split("//")[1].split(".")[0]
     api = f"{host}/wday/cxs/{tenant}/{site}/jobs"
-    offset, total = 0, None
+    first = _workday_page(api, 0, {})
+    nl_facets = _workday_nl_facets(first.get("facets", []))
+    if nl_facets is None:
+        pages = _workday_pages(api, {}, first)
+    elif not nl_facets:
+        return  # the board has location filters, and none of them is in the Netherlands
+    else:
+        pages = _workday_pages(api, nl_facets, _workday_page(api, 0, nl_facets))
+    for j in pages:
+        if "title" not in j or "externalPath" not in j:  # some boards pad pages with stubs
+            continue
+        location = j.get("locationsText", "")
+        # Multi-location jobs only say "3 Locations"; the detail endpoint lists them.
+        if re.fullmatch(r"\d+ Locations", location):
+            location = _workday_locations(f"{host}/wday/cxs/{tenant}/{site}{j['externalPath']}") or location
+        yield j["title"], location, base + j["externalPath"], ""
+
+
+def _workday_page(api, offset, facets):
+    r = requests.post(api, json={"limit": 20, "offset": offset, "searchText": "", "appliedFacets": facets},
+                      headers=HEADERS, timeout=TIMEOUT)
+    r.raise_for_status()
+    return r.json()
+
+
+def _workday_pages(api, facets, first):
+    # Yields the postings of `first` (the page at offset 0) and of every page after it.
+    # The API reports `total` only on the first page (later pages say 0), so read it once.
+    total, data, offset = first["total"], first, 0
     while True:
-        r = requests.post(api, json={"limit": 20, "offset": offset, "searchText": "", "appliedFacets": {}},
-                          headers=HEADERS, timeout=TIMEOUT)
-        r.raise_for_status()
-        data = r.json()
-        if total is None:
-            total = data["total"]
-        for j in data["jobPostings"]:
-            if "title" not in j or "externalPath" not in j:  # some boards pad pages with stubs
-                continue
-            location = j.get("locationsText", "")
-            # Multi-location jobs only say "3 Locations"; the detail endpoint lists them.
-            if re.fullmatch(r"\d+ Locations", location):
-                location = _workday_locations(f"{host}/wday/cxs/{tenant}/{site}{j['externalPath']}") or location
-            yield j["title"], location, base + j["externalPath"], ""
+        yield from data["jobPostings"]
         offset += 20
         if offset >= total or not data["jobPostings"]:
             break
+        data = _workday_page(api, offset, facets)
+
+
+def _workday_nl_facets(facets):
+    """Pick the search filter that asks a Workday board for its Netherlands jobs (ADR-0008).
+
+    The filter's name differs per board (locationCountry, Country, even "a"), but its
+    Netherlands value is always called "Netherlands". Boards without a country filter only
+    have `locations`, a list of offices; those in the Netherlands are picked by place name.
+    Returns {} when the board has location filters but none in the Netherlands (it has no
+    Dutch jobs right now), and None when it has no location filter at all.
+    """
+    found = list(_walk_facets(facets))
+    for f in found:
+        if f.get("facetParameter") != "locations":
+            ids = [v["id"] for v in f.get("values", [])
+                   if "id" in v and v.get("descriptor", "").strip().lower() == "netherlands"]
+            if ids:
+                return {f["facetParameter"]: ids}
+    for f in found:
+        if f.get("facetParameter") == "locations":
+            ids = [v["id"] for v in f.get("values", []) if "id" in v and names_nl_place(v.get("descriptor", ""))]
+            if ids:
+                return {"locations": ids}
+    if any(f.get("facetParameter") == "locations" or "country" in f.get("facetParameter", "").lower()
+           for f in found):
+        return {}
+    return None
+
+
+def _walk_facets(facets):
+    # Some boards nest their country filter inside `locationMainGroup`; a value that has
+    # its own `facetParameter` is such a nested filter.
+    for f in facets:
+        yield f
+        yield from _walk_facets([v for v in f.get("values", []) if "facetParameter" in v])
 
 
 def _workday_locations(detail_url):
