@@ -6,7 +6,7 @@ Catawiki,Catawiki B.V.,,Dutch tech & scale-ups,yes,greenhouse,catawiki,auto
 Coolblue,Coolblue B.V.,,Dutch tech & scale-ups,,smartrecruiters,coolblue,auto
 Just Eat Takeaway.com,Takeaway.com European Operations B.V.,Takeaway.com Central Core B.V.; Takeaway.com Group B.V.; Takeaway.com Payments B.V.; Takeaway.com Express Dutch Operations B.V.; Takeaway.com Express Holding B.V.,Dutch tech & scale-ups,,,,none
 Prosus,Prosus N.V.,Prosus Services B.V.,Dutch tech & scale-ups,yes,ashby,prosus,auto
-TomTom,TomTom International B.V.,TomTom Global Content B.V.; TomTom Navigation B.V.; TomTom Sales B.V.; TomTom Traffic B.V.,Dutch tech & scale-ups,,,,none
+TomTom,TomTom International B.V.,TomTom Global Content B.V.; TomTom Navigation B.V.; TomTom Sales B.V.; TomTom Traffic B.V.,Dutch tech & scale-ups,,lever_eu,tomtom,hand
 Exact,Exact B.V.,Exact Cloud Development Benelux B.V.,Dutch tech & scale-ups,,,,none
 WeTransfer,Wetransfer B.V.,,Dutch tech & scale-ups,,,,none
 Bird (MessageBird),Messagebird B.V.,,Dutch tech & scale-ups,,,,none
@@ -302,7 +302,7 @@ Citi,Citibank Europe Public Limited Company Netherlands Branch,,Banks & insuranc
 J.P. Morgan,J.P. Morgan SE Amsterdam Branch,,Banks & insurance,,,,none
 Goldman Sachs,"Goldman Sachs Bank Europe SE, Amsterdam Branch",Goldman Sachs Personeel B.V.,Banks & insurance,,,,none
 Barclays,"Barclays Bank Ireland Plc, Netherlands branch",,Banks & insurance,,workday,https://barclays.wd3.myworkdayjobs.com/External_Career_Site_Barclays,hand
-HSBC,HSBC Continental Europe,,Banks & insurance,,,,none
+HSBC,HSBC Continental Europe,,Banks & insurance,,eightfold,https://portal.careers.hsbc.com/careers?domain=hsbc.com,hand
 BlackRock,BlackRock (Netherlands) B.V.,,Banks & insurance,,workday,https://blackrock.wd1.myworkdayjobs.com/BlackRock_Professional,hand
 State Street,State Street Bank International GmbH Amsterdam Branch,,Banks & insurance,,workday,https://statestreet.wd1.myworkdayjobs.com/Global,hand
 Northern Trust,Northern Trust Fund Managers (Ireland) Limited Netherlands Branch,,Banks & insurance,,,,none
@@ -394,7 +394,7 @@ March Networks,March Networks B.V.,,Cybersecurity,,,,none
 Nedap,Nedap N.V.,,"Hardware, semiconductors & deep tech",,,,none
 ASML,ASML Netherlands B.V.,ASML Holding N.V.; ASML Trading B.V.,"Hardware, semiconductors & deep tech",,workday,https://asml.wd3.myworkdayjobs.com/ASMLEXT1,hand
 NXP Semiconductors,NXP Semiconductors Netherlands B.V.,NXP Semiconductors N.V.; NXP B.V.,"Hardware, semiconductors & deep tech",,workday,https://nxp.wd3.myworkdayjobs.com/careers,hand
-Signify,Signify Netherlands B.V.,Signify N.V.; Signify Holding B.V.,"Hardware, semiconductors & deep tech",,,,none
+Signify,Signify Netherlands B.V.,Signify N.V.; Signify Holding B.V.,"Hardware, semiconductors & deep tech",,workday,https://lighting.wd3.myworkdayjobs.com/jobs-and-careers,hand
 ASM International,ASM International N.V.,ASM Europe BV; ASM IP Holding B.V.,"Hardware, semiconductors & deep tech",,,,none
 Besi,BE Semiconductor Industries N.V.,Besi Netherlands B.V.,"Hardware, semiconductors & deep tech",,,,none
 Nexperia,Nexperia B.V.,,"Hardware, semiconductors & deep tech",,,,none
@@ -964,7 +964,7 @@ Elsevier,Elsevier B.V.,,Corporates with tech teams,yes,workday,https://relx.wd3.
 LexisNexis,LexisNexis Business Information Solutions B.V.,,Corporates with tech teams,,,,none
 LexisNexis Risk Solutions,LNRS Data Services B.V.,,Corporates with tech teams,yes,workday,https://relx.wd3.myworkdayjobs.com/RiskSolutions,hand
 Wolters Kluwer,Wolters Kluwer Global Business Services B.V.,Wolters Kluwer N.V.; Wolters Kluwer Nederland B.V.; Wolters Kluwer Financial Services Netherlands B.V.; Wolters Kluwer TAA Europe Cloud Strategy & Operations C.V.; Wolters Kluwer Tax and Accounting Nederland B.V.,Corporates with tech teams,,workday,https://wk.wd3.myworkdayjobs.com/External,hand
-Ahold Delhaize,Ahold Delhaize GSO B.V.,Ahold Delhaize European Business Services B.V.; Koninklijke Ahold Delhaize N.V.,Corporates with tech teams,,,,
+Ahold Delhaize,Ahold Delhaize GSO B.V.,Ahold Delhaize European Business Services B.V.; Koninklijke Ahold Delhaize N.V.,Corporates with tech teams,,getnoticed,https://careers.aholddelhaize.com,hand
 Albert Heijn,Albert Heijn B.V.,Albert Heijn Support B.V.,Corporates with tech teams,,,,none
 VDL Groep (other),VDL Bus & Coach B.V.,VDL Energy Systems B.V.; VDL Enabling Transport Solutions B.V.,Corporates with tech teams,,,,none
 Marel,Marel Holding B.V.,Marel GDC B.V.; Marel Further Processing B.V.; Marel Customer Center B.V.,Corporates with tech teams,,,,none
@@ -975,10 +975,10 @@ Vopak Global IT,Vopak Global IT B.V.,,Corporates with tech teams,,,,none
 Tata Steel,Tata Steel Nederland Technology B.V.,Tata Steel Nederland B.V.; Tata Steel IJmuiden B.V.; Tata Steel Nederland Services B.V.,Corporates with tech teams,,,,none
 NewCold Digital,NewCold Digital B.V.,,Corporates with tech teams,,,,none
 Unilever,Unilever Europe Business Center B.V.,Unilever Europe B.V.; Unilever Nederland; Unilever Foods & Refreshments Global B.V.; Unilever Innovation Centre Wageningen B.V.,Corporates with tech teams,,greenhouse,unilever,review
-Heineken,Heineken International B.V.,Heineken N.V.; Heineken Nederland B.V.; Heineken Group B.V.; Heineken Netherlands Supply B.V.,Corporates with tech teams,,,,none
+Heineken,Heineken International B.V.,Heineken N.V.; Heineken Nederland B.V.; Heineken Group B.V.; Heineken Netherlands Supply B.V.,Corporates with tech teams,,heineken,https://careers.theheinekencompany.com,hand
 FrieslandCampina,FrieslandCampina Nederland B.V.,,Corporates with tech teams,,,,none
-DSM-Firmenich,Koninklijke DSM N.V.,DSM NL Services B.V.,Corporates with tech teams,,,,none
-AkzoNobel,Akzo Nobel N.V.,AKZO Nobel Nederland B.V.,Corporates with tech teams,,,,none
+DSM-Firmenich,Koninklijke DSM N.V.,DSM NL Services B.V.,Corporates with tech teams,,eightfold,https://jobs.dsm-firmenich.com/careers?domain=dsm.com,hand
+AkzoNobel,Akzo Nobel N.V.,AKZO Nobel Nederland B.V.,Corporates with tech teams,,phenom,https://careers.akzonobel.com/gb/en,hand
 IMCD,IMCD N.V.,IMCD Group B.V.; IMCD Benelux,Corporates with tech teams,,,,none
 Aalberts,Aalberts integrated piping systems group B.V.,Aalberts hfc B.V.,Corporates with tech teams,,smartrecruiters,aalberts,hand
 Kramp,Kramp Groep B.V.,,Corporates with tech teams,,,,none

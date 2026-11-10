@@ -32,7 +32,7 @@ cannot be finished without him.
   a fetcher if it is not one of the six supported kinds, add the `targets.csv` row as
   `hand`. If a site refuses automated access, stop on that employer and list it below.
   *Done: ASML, Booking.com, ABN AMRO fetched; Rabobank blocked, see below.*
-- [ ] **8. Big employers, other seven** (P9). **plan**
+- [x] **8. Big employers, other seven** (P9). **plan**
   Heineken, Signify, TomTom, Ahold Delhaize, HSBC, DSM (dsm-firmenich), AkzoNobel. Same rules.
 - [ ] **9. Full timed run** (P6, P9). Run the whole pipeline once. The summary must show
   15 minutes or less and at least one job fetched from each of the eleven big employers.
@@ -86,3 +86,17 @@ cannot be finished without him.
 - **ADR-0009 sign-off (task 7).** New source kinds `jibe` (Booking.com) and `getnoticed`
   (ABN AMRO). Both ask for Netherlands jobs only, so "fetched" means Dutch listings, the same
   open question as ADR-0008.
+- **ADR-0010 sign-off (task 8).** Four new source kinds: `lever_eu` (TomTom), `eightfold` (HSBC,
+  DSM-Firmenich), `phenom` (AkzoNobel), `heineken` (its own site, read as HTML). Same open
+  "fetched = Dutch listings" question as ADR-0008/0009.
+- **Ahold Delhaize includes its brands (task 8).** `careers.aholddelhaize.com` also lists Albert
+  Heijn, Etos and Gall & Gall jobs (75 of 145 are Albert Heijn); they appear under "Ahold
+  Delhaize". The site's brand filter returns a server error, so they can't be split cheaply.
+  Albert Heijn's own row stays `none`. Say if that's not fine.
+- **Heineken jobs have no description (task 8).** Descriptions sit on each job page, and the
+  site's 5-second crawl delay would add about 3.7 minutes per run (about 44 jobs x 5 s). Without them, Heineken jobs are
+  judged on title and location only, so Dutch-language or 5+-years jobs may slip through.
+  Suggest deciding after task 9 shows how much of the 15 minutes is left.
+- **FYI: "NLD" is spelled out (task 8).** Ahold Delhaize and AkzoNobel give locations like
+  "Zaandam, NLD", which the location filter rejects. The fetchers now write "Netherlands" for
+  "NLD"; `filters.py` is untouched. Without this nearly all their Dutch jobs would be dropped.
