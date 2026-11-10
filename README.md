@@ -13,6 +13,32 @@ immigration service's list of employers allowed to hire on a skilled-migrant vis
 
 ---
 
+## Status (2026-11-10)
+
+**Done.** The MVP in `docs/requirements.md` is built: see `docs/mvp-report.md` (18 checks pass,
+0 fail, 4 wait on Younes). After the first use of the app, these were added:
+
+- Jobs asking for **3 or more years** of experience are filtered out (was 5+).
+- The tracker **keeps changes made while the Google Sheet is unreachable** and sends them once
+  it answers again; the applied date uses the local date.
+- Step messages and settings comments now match what the pipeline really does.
+
+**In progress, on side branches (not in `master`):**
+
+- `task20-years-round2`: a stricter version of the 3+ years rule. It fixes cases the live
+  version gets wrong (for example "2 - 3 years" is hidden today, and "3 years’ experience" with
+  a curly quote slips through).
+- `task22-dutch-round2`: a new rule that drops English postings requiring Dutch ("fluent in
+  Dutch", "Dutch: fluent"). Until it is merged, only postings *written* in Dutch are dropped,
+  so some Dutch-required jobs still show up.
+
+**Known limits.** Rabobank's careers site blocks automated access, so it is not fetched. New
+filter rules apply only to jobs found from then on; jobs already in `data/jobs.csv` are not
+re-checked. Heineken jobs have no description, so only their title and location are filtered.
+Open decisions and to-dos are listed in `docs/tasks.md` under "Waiting for Younes".
+
+---
+
 ## How it works
 
 ```
@@ -147,7 +173,9 @@ an `ANTHROPIC_API_KEY` in a `.env` file and are untested.
 
 The tracker saves to a tab named **Applications** (columns `title`, `company`, `url`,
 `date_applied`, `status`) in a Google Sheet. When the Sheet cannot be reached, a yellow
-banner appears and the tracker saves to the browser's own storage instead.
+banner appears and changes (a job marked applied, a status changed) wait in the browser's own
+storage. They are sent to the Sheet, in order, the next time the app loads or you make another
+change while the Sheet answers; a job already in the Sheet is never added twice.
 
 1. In the [Google Cloud Console](https://console.cloud.google.com), create a project and
    enable the **Google Sheets API** and **Google Drive API**.
@@ -275,6 +303,14 @@ Tests use fake data only: they never call the Google Sheet or a real job board. 
 the same tests on every push (`.github/workflows/daily.yml`, named "Tests"). It does not run
 the pipeline.
 
+The web app's tracker logic (the queue of unsent changes) has its own tests, run with Node's
+built-in test runner; GitHub does not run these yet:
+
+```powershell
+cd frontend
+npm test
+```
+
 ---
 
 ## Project structure
@@ -297,13 +333,15 @@ job-pipeline/
 ├── run_daily.ps1            # Runs the pipeline with a log (for the scheduled task)
 ├── start.ps1                # Starts the web app
 ├── frontend/                # React 18 + Vite web app
-│   └── src/
-│       ├── App.jsx                     # Page frame, navigation, last run bar
-│       ├── pages/JobBrowser.jsx        # Jobs page
-│       ├── pages/Tracker.jsx           # Tracker page
-│       ├── components/                 # FilterBar, JobCard, StatusDropdown
-│       ├── constants/filters.js        # Web app filter word lists and defaults
-│       └── context/TrackerContext.jsx  # Tracker data: Sheet, with browser fallback
+│   ├── src/
+│   │   ├── App.jsx                     # Page frame, navigation, last run bar
+│   │   ├── pages/JobBrowser.jsx        # Jobs page
+│   │   ├── pages/Tracker.jsx           # Tracker page
+│   │   ├── components/                 # FilterBar, JobCard, StatusDropdown
+│   │   ├── constants/filters.js        # Web app filter word lists and defaults
+│   │   ├── context/TrackerContext.jsx  # Tracker data: Sheet, with browser fallback
+│   │   └── context/trackerQueue.js     # Queue of tracker changes waiting for the Sheet
+│   └── tests/               # Node tests for the tracker queue (npm test)
 ├── tests/                   # pytest tests
 ├── docs/
 │   ├── requirements.md      # What the MVP must do
