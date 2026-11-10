@@ -41,10 +41,11 @@ immigration service's list of employers allowed to hire on a skilled-migrant vis
 `hand`, plus RemoteOK, Arbeitnow and the boards in `scrapers/company_pages.py`.
 *Check:* the run log names every board it tried, with the number of jobs fetched and kept.
 
-**P2. Filters.** A job is kept only if it passes all four existing rules in `filters.py`:
+**P2. Filters.** A job is kept only if it passes all five rules in `filters.py`:
 tech word in the title, no seniority word in the title and no 3+ years asked, a Dutch
-location (or plain "Remote"), and not written in Dutch. The rules themselves do not change
-in the MVP, except that the years limit went from 5+ to 3+ (Younes, 2026-11-10).
+location (or plain "Remote"), not written in Dutch, and not requiring Dutch. The rules
+themselves do not change in the MVP, except that the years limit went from 5+ to 3+, and
+English postings that require Dutch are now dropped (Younes, 2026-11-10).
 *Check:* `python -m pytest` passes, including the existing filter tests.
 
 **P3. No repeats.** A job seen in an earlier run is not added again, whether it comes back

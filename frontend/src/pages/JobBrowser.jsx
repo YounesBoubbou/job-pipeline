@@ -16,7 +16,7 @@ import {
   SENIORITY_EXCLUDE,
   EXPERIENCE_EXCLUDE,
   YEARS_REQUIRED,
-  DUTCH_EXCLUDE,
+  passesDutchRequirement,
   EDU_INCLUDE,
 } from '../constants/filters.js'
 
@@ -42,9 +42,9 @@ function passesFilters(job, filters) {
     if (YEARS_REQUIRED.test(text)) return false
   }
 
-  // 3. Language — exclude if any Dutch-required keyword found
+  // 3. Language — exclude if the posting requires Dutch and doesn't call it optional
   if (filters.language) {
-    if (DUTCH_EXCLUDE.some(kw => text.includes(kw))) return false
+    if (!passesDutchRequirement(job.title || '', job.description_snippet || '')) return false
   }
 
   // 4. IND sponsorship — show only confirmed sponsors
