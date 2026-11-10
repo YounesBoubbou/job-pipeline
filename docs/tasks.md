@@ -55,7 +55,7 @@ cannot be finished without him.
 ## Wrap-up
 
 - [x] **16. GitHub job runs tests only** (Q4). Files: `.github/workflows/daily.yml`.
-- [ ] **17. Windows scheduled task** (P8). **Younes**
+- [!] **17. Windows scheduled task** (P8). **Younes**
   New `run_daily.ps1` that runs the pipeline and keeps a log. Write the exact command that
   registers the task for weekdays at 08:00, but do not run it: list it below for Younes.
 - [ ] **18. Documentation** (Q5). `README.md` and the "Project" section of `CLAUDE.md`.
@@ -124,3 +124,28 @@ cannot be finished without him.
   Actions > Caches can be deleted or left to expire. Watch item: Starlette warns that using
   `httpx` with its TestClient is deprecated; a future Starlette release could need
   `requirements.txt` updated.
+- **Task 17: register the daily Windows task (P8).** Paste into a normal PowerShell window (no
+  admin needed). The `StartBoundary` line keeps it at 08:00 Dutch time in summer too; without it
+  Windows stores 07:00 UTC and the run drifts to 09:00 after the clock change.
+  ```powershell
+  $Repo = 'C:\Users\Younes\Desktop\job-pipeline'
+  $action = New-ScheduledTaskAction -Execute 'powershell.exe' `
+      -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$Repo\run_daily.ps1`"" `
+      -WorkingDirectory $Repo
+  $trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At 08:00
+  $trigger.StartBoundary = (Get-Date '08:00').ToString('s')   # local 08:00, also in summer time
+  $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Hours 1) `
+      -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew
+  $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Limited
+  Register-ScheduledTask -TaskName 'Job Pipeline daily' -Action $action -Trigger $trigger `
+      -Settings $settings -Principal $principal `
+      -Description 'Runs the job pipeline (run_daily.ps1) every weekday at 08:00. Logs in logs\.'
+  ```
+  - Check it exists: `Get-ScheduledTask -TaskName 'Job Pipeline daily'`
+  - Test once: `Start-ScheduledTask -TaskName 'Job Pipeline daily'`, then look at the newest file in
+    `logs\` and `Get-ScheduledTaskInfo -TaskName 'Job Pipeline daily'` (LastTaskResult 0 = worked).
+  - Remove: `Unregister-ScheduledTask -TaskName 'Job Pipeline daily' -Confirm:$false`
+  - It runs only while you are signed in (a locked screen is fine), so no password or admin is
+    needed. If the PC was off or asleep at 08:00 it runs as soon as it's back; it won't wake the PC.
+  - P8's check: the next weekday after 08:00, `data\last_run.json` has that morning's
+    `started_at` and a new `logs\run_<date>_HHmm.log` ends in `exit code 0`, with no manual run.

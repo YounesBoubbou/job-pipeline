@@ -11,6 +11,7 @@ env/
 
 # Data / secrets (keep out of source control)
 data/
+logs/
 credentials.json
 *.xlsx
 .env
