@@ -46,7 +46,7 @@ cannot be finished without him.
 - [x] **12. Mark new jobs** (W3). **plan** Files: `api.py`, `frontend/src/components/JobCard.jsx`.
 - [x] **13. Sponsors-only on by default; card shows all required fields** (W2, W4).
   Files: `frontend/src/constants/filters.js`, `frontend/src/components/JobCard.jsx`.
-- [ ] **14. Phone layout** (W6). Files: `JobBrowser.jsx`, `FilterBar.jsx`, `Tracker.jsx`, `JobCard.jsx`.
+- [x] **14. Phone layout** (W6). Files: `JobBrowser.jsx`, `FilterBar.jsx`, `Tracker.jsx`, `JobCard.jsx`.
   Found in task 12: job cards overflow sideways at every width, desktop too; the badge row in
   `JobCard.jsx` (`shrink-0 flex-wrap`, ~line 83) never shrinks so never wraps. Fix for all widths.
   Check both pages at 375 pixels wide and save screenshots to `docs/screenshots/`.

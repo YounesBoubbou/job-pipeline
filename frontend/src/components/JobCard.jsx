@@ -66,21 +66,21 @@ export default function JobCard({ job, onApply }) {
     : 'bg-purple-100 text-purple-700 border-purple-200'
 
   return (
-    <article className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow group">
-      {/* ── Header row ── */}
-      <div className="flex items-start gap-3">
-        {/* Title + company */}
+    <article className="min-w-0 bg-white rounded-xl border border-gray-200 p-4 sm:p-5 hover:shadow-md transition-shadow group">
+      {/* ── Header row: stacked on phones, badges on the right from 640px ── */}
+      <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3">
+        {/* Title + company (wrap rather than cut, so every field stays readable) */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 leading-snug truncate" title={job.title}>
+          <h3 className="font-semibold text-gray-900 leading-snug break-words" title={job.title}>
             {job.title}
           </h3>
-          <p className="text-sm text-gray-500 mt-0.5 truncate">
+          <p className="text-sm text-gray-500 mt-0.5 break-words">
             {[job.company, job.location].filter(Boolean).join(' · ')}
           </p>
         </div>
 
-        {/* Badges */}
-        <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+        {/* Badges: may shrink and wrap (no shrink-0), so they never push past the card */}
+        <div className="flex items-center gap-1.5 flex-wrap sm:justify-end min-w-0">
           {/* W3: added by the most recent pipeline run */}
           {job.is_new && (
             <Badge className="bg-amber-100 text-amber-800 border-amber-300" title="Added by the last run">
@@ -109,7 +109,7 @@ export default function JobCard({ job, onApply }) {
           Found {job.date_found || '—'}
         </span>
 
-        <div className="flex items-center gap-2 flex-wrap justify-end">
+        <div className="flex items-center gap-2 flex-wrap justify-end min-w-0">
           <GenerateButton
             label="Tailor CV"
             state={cvState}
@@ -124,14 +124,15 @@ export default function JobCard({ job, onApply }) {
             href={job.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-blue-600 hover:text-blue-800 font-medium hover:underline"
+            className="text-sm text-blue-600 hover:text-blue-800 font-medium hover:underline
+              px-1 py-2.5 sm:py-1.5"
           >
             Apply →
           </a>
           <button
             onClick={onApply}
             className="text-sm bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white
-              px-3 py-1.5 rounded-lg font-medium transition-colors"
+              px-3 py-2.5 sm:py-1.5 rounded-lg font-medium transition-colors"
           >
             ✓ Mark as Applied
           </button>
@@ -152,7 +153,7 @@ function GenerateButton({ label, state, onClick }) {
       onClick={onClick}
       disabled={loading}
       className="text-sm bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700
-        px-3 py-1.5 rounded-lg font-medium transition-colors disabled:opacity-60 disabled:cursor-wait"
+        px-3 py-2.5 sm:py-1.5 rounded-lg font-medium transition-colors disabled:opacity-60 disabled:cursor-wait"
     >
       {loading ? '⏳ Generating…' : `✨ ${label}`}
     </button>
@@ -163,7 +164,7 @@ function ResultPanel({ state, onClose }) {
   if (state.status === 'error') {
     return (
       <div className="mt-3 p-3 bg-red-50 border border-red-300 rounded-lg text-red-700 text-sm flex items-start justify-between gap-3">
-        <span>Generation failed: {state.message}</span>
+        <span className="min-w-0 break-words">Generation failed: {state.message}</span>
         <button onClick={onClose} className="text-red-400 hover:text-red-600 shrink-0">✕</button>
       </div>
     )

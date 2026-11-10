@@ -21,16 +21,17 @@ export default function App() {
     <TrackerProvider>
       <div className="min-h-screen bg-gray-50 text-gray-900">
         {/* ── Nav bar ── */}
-        <nav className="bg-white border-b border-gray-200 px-6 py-3 flex items-center gap-6 sticky top-0 z-10 shadow-sm">
-          <span className="font-bold text-blue-700 text-base tracking-tight">
+        {/* Phones get shorter labels, so the bar fits on one line at 375px */}
+        <nav className="bg-white border-b border-gray-200 px-4 sm:px-6 py-1.5 sm:py-3 flex items-center gap-3 sm:gap-6 sticky top-0 z-10 shadow-sm">
+          <span className="font-bold text-blue-700 text-base tracking-tight whitespace-nowrap">
             🔍 Job Pipeline
           </span>
 
-          <div className="flex gap-1">
-            <NavLink href="#/" active={page === 'browser'}>
+          <div className="flex gap-1 min-w-0">
+            <NavLink href="#/" active={page === 'browser'} short="Jobs">
               Job Browser
             </NavLink>
-            <NavLink href="#/tracker" active={page === 'tracker'}>
+            <NavLink href="#/tracker" active={page === 'tracker'} short="Tracker">
               Application Tracker
             </NavLink>
           </div>
@@ -45,17 +46,18 @@ export default function App() {
   )
 }
 
-function NavLink({ href, active, children }) {
+function NavLink({ href, active, short, children }) {
   return (
     <a
       href={href}
-      className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+      className={`px-3 py-2.5 sm:py-1.5 whitespace-nowrap rounded-md text-sm font-medium transition-colors ${
         active
           ? 'bg-blue-50 text-blue-700'
           : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
       }`}
     >
-      {children}
+      <span className="sm:hidden">{short}</span>
+      <span className="hidden sm:inline">{children}</span>
     </a>
   )
 }
@@ -127,7 +129,7 @@ function LastRunStatus() {
 
       {failed.length > 0 && (
         <details className="mt-1">
-          <summary className="cursor-pointer text-blue-700">Show failed boards</summary>
+          <summary className="cursor-pointer text-blue-700 py-2 sm:py-0">Show failed boards</summary>
           <ul className="mt-1 space-y-1">
             {failed.map((board) => (
               <li key={`${board.source}:${board.name}`} className="break-words">

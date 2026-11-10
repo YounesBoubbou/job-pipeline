@@ -13,7 +13,7 @@ export default function Tracker() {
   const { applications, updateStatus, sheetsOk, loading } = useTracker()
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl font-bold text-gray-900">Application Tracker</h1>
@@ -57,22 +57,23 @@ export default function Tracker() {
       {!loading && applications.length > 0 && (
         <div className="space-y-2">
           {/* Table header */}
-          <div className="hidden sm:grid grid-cols-[1fr_auto_auto_auto] gap-4 px-4 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+          <div className="hidden sm:grid grid-cols-[minmax(0,1fr)_auto_auto_auto] gap-4 px-4 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
             <span>Job</span>
             <span>Applied</span>
             <span>Link</span>
             <span>Status</span>
           </div>
 
+          {/* Phones: job info on top, then date, link and status on one line */}
           {applications.map((app, i) => (
             <div
               key={app.url || i}
-              className="bg-white rounded-lg border border-gray-200 px-4 py-3 grid sm:grid-cols-[1fr_auto_auto_auto] gap-3 sm:gap-4 items-center hover:border-gray-300 transition-colors"
+              className="bg-white rounded-lg border border-gray-200 px-4 py-3 grid grid-cols-[auto_auto_minmax(0,1fr)] sm:grid-cols-[minmax(0,1fr)_auto_auto_auto] gap-x-4 gap-y-2 sm:gap-4 items-center hover:border-gray-300 transition-colors"
             >
               {/* Job info */}
-              <div className="min-w-0">
-                <p className="font-medium text-gray-900 text-sm truncate">{app.title}</p>
-                <p className="text-gray-500 text-xs mt-0.5">{app.company}</p>
+              <div className="min-w-0 col-span-3 sm:col-span-1">
+                <p className="font-medium text-gray-900 text-sm break-words sm:truncate" title={app.title}>{app.title}</p>
+                <p className="text-gray-500 text-xs mt-0.5 break-words">{app.company}</p>
               </div>
 
               {/* Date applied */}
@@ -86,7 +87,7 @@ export default function Tracker() {
                   href={app.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-blue-600 hover:underline whitespace-nowrap"
+                  className="text-xs text-blue-600 hover:underline whitespace-nowrap py-2.5 sm:py-0"
                   title={app.url}
                 >
                   View →
@@ -97,6 +98,7 @@ export default function Tracker() {
 
               {/* Status dropdown */}
               <StatusDropdown
+                className="justify-self-end sm:justify-self-auto"
                 value={app.status}
                 onChange={status => updateStatus(app.url, status)}
               />

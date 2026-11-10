@@ -92,7 +92,8 @@ export default function JobBrowser() {
   ), [jobs, filters, trackedUrls])
 
   return (
-    <div className="flex" style={{ minHeight: 'calc(100vh - 49px)' }}>
+    // Phones: filters stack above the list (as a fold-out panel); from 768px: sidebar
+    <div className="flex flex-col md:flex-row" style={{ minHeight: 'calc(100vh - 49px)' }}>
       {/* ── Filter sidebar ── */}
       <FilterBar
         filters={filters}
@@ -102,7 +103,7 @@ export default function JobBrowser() {
       />
 
       {/* ── Job list ── */}
-      <main className="flex-1 p-6 overflow-y-auto">
+      <main className="flex-1 min-w-0 p-4 sm:p-6">
         {/* Sheets warning */}
         {!sheetsOk && (
           <div className="mb-4 flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-800 text-sm">
@@ -128,7 +129,8 @@ export default function JobBrowser() {
               {trackedUrls.size > 0 && ` (${trackedUrls.size} applied hidden)`}
             </p>
 
-            <div className="grid gap-3">
+            {/* grid-cols-1 is minmax(0, 1fr): a long title can't widen the column past the screen */}
+            <div className="grid grid-cols-1 gap-3">
               {filtered.map(job => (
                 <JobCard
                   key={job.url}
