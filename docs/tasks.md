@@ -54,7 +54,7 @@ cannot be finished without him.
 
 ## Wrap-up
 
-- [ ] **16. GitHub job runs tests only** (Q4). Files: `.github/workflows/daily.yml`.
+- [x] **16. GitHub job runs tests only** (Q4). Files: `.github/workflows/daily.yml`.
 - [ ] **17. Windows scheduled task** (P8). **Younes**
   New `run_daily.ps1` that runs the pipeline and keeps a log. Write the exact command that
   registers the task for weekdays at 08:00, but do not run it: list it below for Younes.
@@ -118,3 +118,9 @@ cannot be finished without him.
   the UTC date. One-line fix; say if you want it. (b) There is no way to remove an application
   from the tracker, in the app or the API. The live test row was removed directly in the Sheet,
   which now matches its earlier state.
+- **GitHub after you push `mvp` (task 16, Q4).** Check the "Tests" workflow goes green on the
+  Actions tab; that is Q4's check. Optional clean-up: Sheets secrets under Settings > Secrets and
+  variables > Actions are now unused, and the old `seen-jobs-*` / `ind-register-*` caches under
+  Actions > Caches can be deleted or left to expire. Watch item: Starlette warns that using
+  `httpx` with its TestClient is deprecated; a future Starlette release could need
+  `requirements.txt` updated.

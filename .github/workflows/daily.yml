@@ -1,54 +1,28 @@
-name: Daily Job Pipeline
+name: Tests
 
+# Q4: the GitHub job no longer runs the pipeline; it runs the tests whenever code is pushed.
+# The pipeline itself runs on Younes's PC (Windows scheduled task, P8), so this job needs
+# no secrets, no data/ folder and no network beyond installing packages.
 on:
-  schedule:
-    # Runs every weekday at 08:00 Amsterdam time (07:00 UTC)
-    - cron: "0 7 * * 1-5"
-  workflow_dispatch:   # allows manual trigger from GitHub UI
+  push:
+  workflow_dispatch:   # allows a manual run from the GitHub UI
 
 jobs:
-  run-pipeline:
+  test:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      # Same Python version as the local venv that runs the pipeline
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.10"
 
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # Restore the seen-jobs cache so we don't re-surface old listings
-      - name: Restore seen jobs cache
-        uses: actions/cache@v4
-        with:
-          path: data/seen_jobs.json
-          key: seen-jobs-${{ github.run_id }}
-          restore-keys: seen-jobs-
-
-      # Restore the IND register so we don't re-download every day
-      - name: Restore IND register cache
-        uses: actions/cache@v4
-        with:
-          path: data/ind_sponsors.csv
-          key: ind-register-${{ github.run_id }}
-          restore-keys: ind-register-
-
-      # Stop before touching any data if a filter or dedup test fails
       - name: Run tests
         run: python -m pytest -q
-
-      - name: Run pipeline
-        run: python main.py
-
-      # Upload the CSV as a downloadable artifact in the Actions UI
-      - name: Upload jobs CSV
-        uses: actions/upload-artifact@v4
-        with:
-          name: jobs-${{ github.run_id }}
-          path: data/jobs.csv
-          retention-days: 30
