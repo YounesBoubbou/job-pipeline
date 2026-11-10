@@ -39,7 +39,7 @@ cannot be finished without him.
 
 ## Web app
 
-- [ ] **10. One command to start, reachable on home Wi-Fi** (W1, W7). **Younes** (phone check)
+- [!] **10. One command to start, reachable on home Wi-Fi** (W1, W7). **Younes** (phone check)
   New `start.ps1`; `frontend/vite.config.js` (listen on the network, not only this PC);
   `api.py` if needed. The script prints the address to open on the phone.
 - [ ] **11. Last run status** (W8). Files: `api.py`, `frontend/src/App.jsx`.
@@ -105,3 +105,9 @@ cannot be finished without him.
   Rabobank is missing because it is blocked (see above). P9 passes once you decide on Rabobank.
   HSBC fetched only 1, so it may show 0 on some days. Other failures, none a big employer: NXP
   (422, known), and Payconiq, 50five and Leiden University, whose Recruitee boards now answer 404.
+- **Task 10: phone check (W7).** Built, reviewed and committed; only your phone check is left.
+  Run `powershell -ExecutionPolicy Bypass -File .\start.ps1` in the repo folder, open the green
+  "On a phone" address it prints (today `http://192.168.178.28:5173`) on a phone on the same
+  Wi-Fi, and check the job list loads. If it doesn't, run once in an administrator PowerShell:
+  `New-NetFirewallRule -DisplayName "Job pipeline web app (5173)" -Direction Inbound -Protocol TCP -LocalPort 5173 -Action Allow -Profile Private,Public`
+  (or set the home Wi-Fi to Private in Windows and use `-Profile Private` only). Then tick task 10.

@@ -46,25 +46,27 @@ python main.py
 
 Results appear in `data/jobs.csv`. On first run the IND sponsor register (~12 000 companies) is automatically scraped and cached.
 
-### 2 — Run the frontend
+### 2 — Run the web app
 
-Open a second terminal:
+From the repo root, one command starts the API and the frontend:
 
-```bash
-cd frontend
-npm install      # first time only
-npm run dev
+```powershell
+powershell -ExecutionPolicy Bypass -File .\start.ps1
 ```
 
-Then in a third terminal (from the repo root):
+It runs `npm install` the first time (when `frontend\node_modules` is missing), then
+prints two addresses: **http://localhost:5173** for this PC, and `http://<this PC's
+Wi-Fi address>:5173` for a phone on the same Wi-Fi. Ctrl+C stops both halves.
 
-```bash
-python api.py
+> The frontend talks to the API via Vite's proxy, so the API stays on this PC only
+> (127.0.0.1:8000) and the phone needs just port 5173.
+
+If the phone cannot open the page, Windows Firewall is probably blocking port 5173.
+Allow Node.js when Windows asks, or run once in an administrator PowerShell:
+
+```powershell
+New-NetFirewallRule -DisplayName "Job pipeline web app (5173)" -Direction Inbound -Protocol TCP -LocalPort 5173 -Action Allow -Profile Private,Public
 ```
-
-Open **http://localhost:5173** in your browser.
-
-> The frontend talks to the API via Vite's proxy — both must be running at the same time.
 
 ---
 
