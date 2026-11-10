@@ -7,6 +7,7 @@ Run with:
     uvicorn api:app --reload
 """
 
+import json
 import os
 import sys
 import pandas as pd
@@ -20,15 +21,17 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # Pull paths from config; fall back to sensible defaults so api.py
 # works even if config.py has import-time side effects that fail.
 try:
-    from config import CSV_OUTPUT_PATH, SHEETS_CREDENTIALS_FILE, SPREADSHEET_NAME
+    from config import CSV_OUTPUT_PATH, RUN_SUMMARY_PATH, SHEETS_CREDENTIALS_FILE, SPREADSHEET_NAME
 except Exception:
     CSV_OUTPUT_PATH = "data/jobs.csv"
+    RUN_SUMMARY_PATH = "data/last_run.json"
     SHEETS_CREDENTIALS_FILE = "credentials.json"
     SPREADSHEET_NAME = "Job Pipeline"
 
 _ROOT = os.path.dirname(os.path.abspath(__file__))
 CSV_PATH = os.path.join(_ROOT, CSV_OUTPUT_PATH)
 CREDS_PATH = os.path.join(_ROOT, SHEETS_CREDENTIALS_FILE)
+SUMMARY_PATH = os.path.join(_ROOT, RUN_SUMMARY_PATH)
 
 TRACKER_TAB = "Applications"
 TRACKER_COLUMNS = ["title", "company", "url", "date_applied", "status"]
@@ -86,6 +89,22 @@ def get_jobs():
         return []
     df = pd.read_csv(CSV_PATH, dtype=str).fillna("")
     return df.to_dict(orient="records")
+
+
+@app.get("/api/last-run")
+def get_last_run():
+    """Return the summary of the last pipeline run (W8), read from data/last_run.json.
+    A missing or unreadable file is not an error: the app shows the message instead."""
+    if not os.path.exists(SUMMARY_PATH):
+        return {"found": False, "message": "The pipeline has not run yet (no run summary file)."}
+    try:
+        with open(SUMMARY_PATH, encoding="utf-8") as f:
+            summary = json.load(f)
+    except (OSError, ValueError) as exc:
+        return {"found": False, "message": f"The run summary file could not be read: {exc}"}
+    if not isinstance(summary, dict):
+        return {"found": False, "message": "The run summary file could not be read: not a JSON object."}
+    return {"found": True, "summary": summary}
 
 
 class TrackerEntry(BaseModel):

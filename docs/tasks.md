@@ -42,7 +42,7 @@ cannot be finished without him.
 - [!] **10. One command to start, reachable on home Wi-Fi** (W1, W7). **Younes** (phone check)
   New `start.ps1`; `frontend/vite.config.js` (listen on the network, not only this PC);
   `api.py` if needed. The script prints the address to open on the phone.
-- [ ] **11. Last run status** (W8). Files: `api.py`, `frontend/src/App.jsx`.
+- [x] **11. Last run status** (W8). Files: `api.py`, `frontend/src/App.jsx`.
 - [ ] **12. Mark new jobs** (W3). **plan** Files: `api.py`, `frontend/src/components/JobCard.jsx`.
 - [ ] **13. Sponsors-only on by default; card shows all required fields** (W2, W4).
   Files: `frontend/src/constants/filters.js`, `frontend/src/components/JobCard.jsx`.
