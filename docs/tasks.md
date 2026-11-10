@@ -19,7 +19,7 @@ cannot be finished without him.
 - [x] **3. Target-list copy wins a duplicate** (P4).
   Files: `output.py` (`deduplicate`, `_posting_key`). Test: one job from both sources ends
   as one row labelled `Yes`.
-- [ ] **4. Test: a second run adds nothing** (P3). Files: `tests/test_output.py`.
+- [x] **4. Test: a second run adds nothing** (P3). Files: `tests/test_output.py`.
 - [ ] **5. Valtech board** (P5). Its Greenhouse token returns "not found". Find the right
   board and fix the row in `targets.csv`, or leave it failing and visible in the summary.
 - [ ] **6. Workday speed** (P6). **plan**
