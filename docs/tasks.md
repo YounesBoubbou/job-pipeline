@@ -71,7 +71,8 @@ cannot be finished without him.
   contents on the next successful load. Keep such changes and send them to the Sheet once it
   answers again; never add the same job twice. Also use the local date, not UTC, for
   `date_applied` (line 72).
-- [ ] **22. Filter out jobs that require Dutch.** **plan** Files: `filters.py`, `config.py`,
+- [!] **22. Filter out jobs that require Dutch.** Review failed twice, see "Waiting for
+  Younes". **plan** Files: `filters.py`, `config.py`,
   `frontend/src/constants/filters.js`, tests. The language rule only drops postings written
   in Dutch; English postings that say Dutch is required ("fluent in Dutch", "Dutch is a
   must", "native Dutch speaker", "Nederlands vereist") get through. Drop those; keep postings
@@ -91,6 +92,18 @@ cannot be finished without him.
   "max / no more than 3 years" would be hidden. The fixes are known and small. Your call:
   (a) allow a third round (my recommendation): fix those three on the branch, review, merge
   into `mvp`; (b) merge the branch as is; (c) keep `mvp` as is.
+- **Task 22: "requires Dutch" rule failed review twice.** Parked on branch
+  `task22-dutch-round2` (`2a85445`, not merged; `mvp` still has only the "written in Dutch"
+  rule). It catches the common requirement phrasings ("fluent in Dutch", "communication skills
+  in Dutch and English", "Dutch: fluent") and keeps "Dutch is a plus", "Nice to have" sections,
+  "Dutch market" and "you don't need to speak Dutch". Round 2 review still found postings it
+  wrongly drops: "our colleagues speak Dutch, but English is our working language", "Don't speak
+  Dutch? No problem!", "If you speak Dutch, that's a plus", "Dutch is appreciated". Each round
+  of word-list rules finds new edge cases. Your call: (a) a third round on the branch for those
+  four, then merge (fixes known); (b) merge as is: it removes most Dutch-required jobs but hides a
+  few you could do; (c) replace the word lists with a Claude check of each kept job's description
+  (more accurate, but costs API money per new job, likely well under 1 euro a day,
+  needs an API key on the PC, and is a design change that needs an ADR); (d) drop the task.
 
 - **ADR-0007 sign-off** (`docs/adr/0007-run-summary-file.md`, status "proposed"). Three readings to
   confirm or overrule: "kept" counts jobs that passed the filters at a board, before removing
