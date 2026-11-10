@@ -61,6 +61,24 @@ cannot be finished without him.
 - [x] **18. Documentation** (Q5). `README.md` and the "Project" section of `CLAUDE.md`.
 - [x] **19. Final report.** `docs/mvp-report.md`: every requirement, its check, pass or fail.
 
+## Follow-ups after first use (Younes, 2026-11-10)
+
+- [ ] **20. Exclude 3+ years, not 5+** (P2, changed by Younes). Committed as `3e7446f`; in review.
+- [x] **21. Tracker keeps changes made while the Sheet is down.** Files:
+  `frontend/src/context/TrackerContext.jsx`. Today a job marked applied (or a status changed)
+  while the Sheet is unreachable lives only in the browser and is overwritten by the Sheet's
+  contents on the next successful load. Keep such changes and send them to the Sheet once it
+  answers again; never add the same job twice. Also use the local date, not UTC, for
+  `date_applied` (line 72).
+- [ ] **22. Filter out jobs that require Dutch.** **plan** Files: `filters.py`, `config.py`,
+  `frontend/src/constants/filters.js`, tests. The language rule only drops postings written
+  in Dutch; English postings that say Dutch is required ("fluent in Dutch", "Dutch is a
+  must", "native Dutch speaker", "Nederlands vereist") get through. Drop those; keep postings
+  where Dutch is only a plus ("Dutch is a plus", "nice to have", "not required").
+- [ ] **23. Code leftovers** (from task 18). `main.py` says "Fetching jobs from Indeed RSS"
+  but fetches RemoteOK and Arbeitnow; unused `IND_REGISTER_URL` and stale comments in
+  `config.py`. No behaviour change.
+
 ## Waiting for Younes
 
 - **ADR-0007 sign-off** (`docs/adr/0007-run-summary-file.md`, status "proposed"). Three readings to
