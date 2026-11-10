@@ -34,7 +34,7 @@ cannot be finished without him.
   *Done: ASML, Booking.com, ABN AMRO fetched; Rabobank blocked, see below.*
 - [x] **8. Big employers, other seven** (P9). **plan**
   Heineken, Signify, TomTom, Ahold Delhaize, HSBC, DSM (dsm-firmenich), AkzoNobel. Same rules.
-- [ ] **9. Full timed run** (P6, P9). Run the whole pipeline once. The summary must show
+- [!] **9. Full timed run** (P6, P9). Run the whole pipeline once. The summary must show
   15 minutes or less and at least one job fetched from each of the eleven big employers.
 
 ## Web app
@@ -100,3 +100,8 @@ cannot be finished without him.
 - **FYI: "NLD" is spelled out (task 8).** Ahold Delhaize and AkzoNobel give locations like
   "Zaandam, NLD", which the location filter rejects. The fetchers now write "Netherlands" for
   "NLD"; `filters.py` is untouched. Without this nearly all their Dutch jobs would be dropped.
+- **Task 9 blocked on Rabobank.** Full run on 2026-11-10: completed in 291 s (P6 passes, limit
+  900), 284 jobs added, 188 boards, 4 failed. 10 of the 11 big employers fetched at least one job;
+  Rabobank is missing because it is blocked (see above). P9 passes once you decide on Rabobank.
+  HSBC fetched only 1, so it may show 0 on some days. Other failures, none a big employer: NXP
+  (422, known), and Payconiq, 50five and Leiden University, whose Recruitee boards now answer 404.
