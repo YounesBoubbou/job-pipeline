@@ -37,10 +37,17 @@ def _posting_key(job: dict) -> str:
     return f"{normalise_name(job['company'])}|{title}"
 
 
+def _is_target(job: dict) -> bool:
+    """Target-list jobs are tagged 'Target (<vendor>)' by scrapers/targets.py."""
+    return job.get("source", "").startswith("Target")
+
+
 def deduplicate(jobs: list[dict], seen: set) -> list[dict]:
-    """Filter out jobs already seen in previous runs, or earlier in this one."""
+    """Filter out jobs already seen in previous runs, or earlier in this one.
+    Target-list jobs are checked first, so when the same posting also comes from a job
+    board, the target-list copy is kept whatever order the sources were fetched in (P4)."""
     new_jobs = []
-    for j in jobs:
+    for j in sorted(jobs, key=lambda j: not _is_target(j)):  # stable: keeps order otherwise
         key = _posting_key(j)
         if j["url"] in seen or key in seen:
             continue

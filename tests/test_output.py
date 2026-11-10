@@ -1,5 +1,6 @@
 import json
 
+import ind_checker
 import output
 from output import deduplicate
 
@@ -27,6 +28,23 @@ def test_dedup_drops_posting_seen_in_earlier_run():
 def test_dedup_keeps_different_titles():
     jobs = [_job("https://a/1"), _job("https://a/2", title="Junior ML Engineer")]
     assert len(deduplicate(jobs, set())) == 2
+
+
+def test_dedup_keeps_target_copy_labelled_yes_in_either_order(monkeypatch):
+    # The Stream case: a board lists the job under its trade name, which is not on the
+    # register; the target-list row carries the registered name, which is.
+    monkeypatch.setattr(ind_checker, "_SPONSORS", {ind_checker.normalise_name("Stream.io B.V.")})
+    board = {"url": "https://remoteok.com/1", "title": "Junior Backend Engineer",
+             "company": "Stream", "source": "RemoteOK"}
+    target = {"url": "https://boards.greenhouse.io/stream/1", "title": "Junior Backend Engineer",
+              "company": "Stream", "ind_registered_name": "Stream.io B.V.",
+              "source": "Target (greenhouse)"}
+
+    for jobs in ([board, target], [target, board]):
+        kept = deduplicate([dict(j) for j in jobs], set())
+        assert len(kept) == 1
+        assert kept[0]["source"] == "Target (greenhouse)"
+        assert ind_checker.job_sponsor_status(kept[0]) == "Yes"
 
 
 def test_write_run_summary_creates_dir_and_valid_json(tmp_path, monkeypatch):

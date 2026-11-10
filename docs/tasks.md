@@ -16,7 +16,7 @@ cannot be finished without him.
   board the number fetched and kept, plus failed boards with the reason. A failing source
   never stops the run. `fetch_target_jobs` in `scrapers/targets.py` already collects
   `failed`; the job-board and company-page scrapers must report the same way.
-- [ ] **3. Target-list copy wins a duplicate** (P4).
+- [x] **3. Target-list copy wins a duplicate** (P4).
   Files: `output.py` (`deduplicate`, `_posting_key`). Test: one job from both sources ends
   as one row labelled `Yes`.
 - [ ] **4. Test: a second run adds nothing** (P3). Files: `tests/test_output.py`.
@@ -63,3 +63,7 @@ cannot be finished without him.
   confirm or overrule: "kept" counts jobs that passed the filters at a board, before removing
   repeats from earlier runs; P1's "run log" is the console output plus the `boards` list in
   `data/last_run.json`; the file also records `duration_seconds` (read by task 9's 15-minute check).
+- **FYI, cross-run labels (task 3).** P4 is handled within one run. A job already saved from a job
+  board on an earlier day keeps its `No` label when the target list later finds it, because P3
+  forbids re-adding it. Same if a target board fails on the day a job board lists the job. Say if
+  you want old rows relabelled.
