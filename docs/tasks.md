@@ -27,10 +27,11 @@ cannot be finished without him.
   Files: `scrapers/targets.py` (`_workday`). Ask each Workday board for Netherlands jobs
   only instead of downloading every listing. Check each of the 22 boards still returns its
   Dutch jobs afterwards.
-- [ ] **7. Big employers, first four** (P9). **plan**
+- [x] **7. Big employers, first four** (P9). **plan**
   ASML, Booking.com, ABN AMRO, Rabobank. For each: find where its jobs are published, add
   a fetcher if it is not one of the six supported kinds, add the `targets.csv` row as
   `hand`. If a site refuses automated access, stop on that employer and list it below.
+  *Done: ASML, Booking.com, ABN AMRO fetched; Rabobank blocked, see below.*
 - [ ] **8. Big employers, other seven** (P9). **plan**
   Heineken, Signify, TomTom, Ahold Delhaize, HSBC, DSM (dsm-firmenich), AkzoNobel. Same rules.
 - [ ] **9. Full timed run** (P6, P9). Run the whole pipeline once. The summary must show
@@ -74,3 +75,14 @@ cannot be finished without him.
 - **ADR-0008 sign-off (task 6).** Workday boards are now asked for Netherlands jobs only, so for
   them "fetched" counts the board's Dutch listings, not every listing worldwide. Confirm this
   server-side country filter does not count as "filtering" for P9's "at least one job fetched".
+- **Rabobank is blocked (task 7, P9 stop rule).** Every Rabobank careers site (`rabobank.jobs`,
+  `rabobank.com/careers`, `rabobank.nl/werken-bij`, even their robots.txt) answers 403 from an
+  Akamai bot wall, and no public job-board system was found. Its `targets.csv` row is left as
+  `none`. Your call: drop Rabobank from P9, give another route, or accept it as not fetched.
+- **ASML robots.txt (task 7, went ahead).** `asml.wd3.myworkdayjobs.com/robots.txt` disallows
+  `/ASMLEXT1/` (the board's web pages). The pipeline reads only the JSON API at
+  `/wday/cxs/asml/ASMLEXT1/...`, which is not disallowed, as with the other 22 Workday boards.
+  Say if you read the rule as a refusal and want ASML held.
+- **ADR-0009 sign-off (task 7).** New source kinds `jibe` (Booking.com) and `getnoticed`
+  (ABN AMRO). Both ask for Netherlands jobs only, so "fetched" means Dutch listings, the same
+  open question as ADR-0008.

@@ -2,7 +2,8 @@
 scrapers/targets.py — Fetch openings for every company in targets.csv (ADR-0005).
 
 Each row names a company, its ATS vendor (`source`) and its board token. Every vendor
-here has a public JSON API, so no HTML is scraped. Boards that fail are reported at the
+here has a public JSON API (GetNoticed's descriptions come from its RSS feed), so no HTML
+is scraped. Boards that fail are reported at the
 end of the run rather than skipped silently, since a failure usually means the company
 moved to another ATS and the row needs updating.
 """
@@ -10,6 +11,8 @@ moved to another ATS and the row needs updating.
 import csv
 import os
 import re
+import time
+import xml.etree.ElementTree as ET
 from datetime import datetime
 
 import requests
@@ -170,6 +173,77 @@ def _workday_locations(detail_url):
     return "; ".join([info.get("location", "")] + info.get("additionalLocations", []))
 
 
+# Booking.com and ABN AMRO run their own careers sites on iCIMS Jibe and GetNoticed
+# (ADR-0009). Both are asked for Netherlands jobs only, like Workday (ADR-0008).
+
+def _jibe(token):
+    # Token is the careers site, e.g. https://jobs.booking.com. Its robots.txt asks for
+    # 5 seconds between requests.
+    base, page = token.rstrip("/"), 1
+    while True:
+        r = requests.get(f"{base}/api/jobs", params={"page": page, "limit": 100, "country": "Netherlands"},
+                         headers=HEADERS, timeout=TIMEOUT)
+        r.raise_for_status()
+        data = r.json()
+        for x in data["jobs"]:
+            j = x["data"]
+            yield j["title"], j.get("full_location", ""), j["meta_data"]["canonical_url"], j.get("description", "")
+        if page * 100 >= data["totalCount"] or not data["jobs"]:
+            break
+        page += 1
+        time.sleep(5)
+
+
+def _getnoticed(token):
+    # Token is the careers site, e.g. https://www.werkenbijabnamro.nl. The API answers with
+    # JSON only when the request says it comes from the page's own script, and pages are
+    # fixed at 8 vacancies. The country filter is picked from the first page's facets.
+    base = token.rstrip("/")
+    headers = {**HEADERS, "X-Requested-With": "XMLHttpRequest"}
+
+    def page(n, filters):
+        r = requests.get(f"{base}/api/vacancy/", params={"pageNumber": n, **filters},
+                         headers=headers, timeout=TIMEOUT)
+        r.raise_for_status()
+        return r.json()
+
+    first, filters = page(1, {}), {}
+    for f in first.get("facets", []):
+        for v in f.get("values", []):
+            if v.get("slug") in ("nederland", "netherlands"):
+                filters = {f"filters[{f['slug']}][]": v["slug"]}
+        if filters:
+            break
+    data = page(1, filters) if filters else first
+    descriptions = _getnoticed_descriptions(base)
+    n = 1
+    while True:
+        for v in data["vacancies"]:
+            location = ", ".join(p for p in (v.get("city"), v.get("country")) if p)
+            yield (v["title"], location, f"{base}/vacature/{v['id']}/{v['slug']}",
+                   descriptions.get(str(v["id"]), ""))
+        n += 1
+        if n > data["meta"]["totalPageCount"] or not data["vacancies"]:
+            break
+        data = page(n, filters)
+
+
+def _getnoticed_descriptions(base):
+    # The listings carry no description, but the RSS feed has every vacancy with its full
+    # text. Returns {vacancy id: description}; {} if the feed can't be read.
+    try:
+        r = requests.get(f"{base}/feeds/rss", headers=HEADERS, timeout=TIMEOUT)
+        r.raise_for_status()
+        descriptions = {}
+        for item in ET.fromstring(r.content).iter("item"):
+            m = re.search(r"/vacature/(\d+)/", item.findtext("link") or "")
+            if m:
+                descriptions[m.group(1)] = item.findtext("description") or ""
+        return descriptions
+    except Exception:
+        return {}
+
+
 # Workday and SmartRecruiters listings carry no description, so it takes one request per job.
 # On failure these return "", which leaves only the title for the filters to judge.
 
@@ -208,6 +282,8 @@ FETCHERS = {
     "recruitee":       _recruitee,
     "smartrecruiters": _smartrecruiters,
     "workday":         _workday,
+    "jibe":            _jibe,
+    "getnoticed":      _getnoticed,
 }
 
 

@@ -1,5 +1,5 @@
 company,ind_registered_name,other_ind_entities,category,already_applied,source,token,board_status
-Booking.com,Booking.com B.V.,Booking.com International B.V.; Booking.com Distribution B.V.; Booking.com Customer Service Center (Netherlands); Booking Holdings B.V.; Booking.com Holding; Booking.com Customer Service Holding,Dutch tech & scale-ups,yes,,,none
+Booking.com,Booking.com B.V.,Booking.com International B.V.; Booking.com Distribution B.V.; Booking.com Customer Service Center (Netherlands); Booking Holdings B.V.; Booking.com Holding; Booking.com Customer Service Holding,Dutch tech & scale-ups,yes,jibe,https://jobs.booking.com,hand
 Picnic,Picnic Technologies B.V.,Picnic International B.V.,Dutch tech & scale-ups,yes,smartrecruiters,picnic,auto
 bol,Bol.com B.V.,,Dutch tech & scale-ups,yes,greenhouse,bolcom,auto
 Catawiki,Catawiki B.V.,,Dutch tech & scale-ups,yes,greenhouse,catawiki,auto
@@ -283,7 +283,7 @@ Jane Street,Jane Street Netherlands B.V.,,Trading & quant,,greenhouse,janestreet
 Jump Trading,Jump Trading Europe B.V.,,Trading & quant,,greenhouse,jumptrading,auto
 Headlands Technologies,Headlands Technologies Europe B.V.,,Trading & quant,,,,none
 ING,ING Bank N.V.,ING Groep N.V.; ING Bank Personeel B.V.,Banks & insurance,,workday,https://ing.wd3.myworkdayjobs.com/ICSGBLCOR,hand
-ABN AMRO,ABN AMRO Bank N.V.,ABN AMRO Asset Based Finance N.V.,Banks & insurance,yes,,,none
+ABN AMRO,ABN AMRO Bank N.V.,ABN AMRO Asset Based Finance N.V.,Banks & insurance,yes,getnoticed,https://www.werkenbijabnamro.nl,hand
 Rabobank,Coöperatieve Rabobank U.A.,,Banks & insurance,yes,,,none
 Triodos Bank,Triodos Bank N.V.,Triodos Investment Management B.V.,Banks & insurance,,,,none
 Saxo,Saxo Bank A/S,,Banks & insurance,yes,,,none
@@ -392,7 +392,7 @@ Network Intelligence,Network Intelligence Europe B.V.,,Cybersecurity,,,,none
 Eagle Eye Networks,Eagle Eye Networks B.V.,,Cybersecurity,,,,none
 March Networks,March Networks B.V.,,Cybersecurity,,,,none
 Nedap,Nedap N.V.,,"Hardware, semiconductors & deep tech",,,,none
-ASML,ASML Netherlands B.V.,ASML Holding N.V.; ASML Trading B.V.,"Hardware, semiconductors & deep tech",,,,none
+ASML,ASML Netherlands B.V.,ASML Holding N.V.; ASML Trading B.V.,"Hardware, semiconductors & deep tech",,workday,https://asml.wd3.myworkdayjobs.com/ASMLEXT1,hand
 NXP Semiconductors,NXP Semiconductors Netherlands B.V.,NXP Semiconductors N.V.; NXP B.V.,"Hardware, semiconductors & deep tech",,workday,https://nxp.wd3.myworkdayjobs.com/careers,hand
 Signify,Signify Netherlands B.V.,Signify N.V.; Signify Holding B.V.,"Hardware, semiconductors & deep tech",,,,none
 ASM International,ASM International N.V.,ASM Europe BV; ASM IP Holding B.V.,"Hardware, semiconductors & deep tech",,,,none
