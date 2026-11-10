@@ -9,7 +9,7 @@ cannot be finished without him.
 
 ## Pipeline
 
-- [ ] **1. Stop writing job rows to the Sheet** (P7).
+- [x] **1. Stop writing job rows to the Sheet** (P7).
   Files: `main.py`, `output.py`, `config.py`. The tracker's use of the Sheet in `api.py` stays.
 - [ ] **2. Run summary file** (P1, P5). **plan**
   Write `data/last_run.json` after every run: start and end time, jobs added, and per

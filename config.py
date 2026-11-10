@@ -61,13 +61,12 @@ COMPANY_PAGES = [
     # in scrapers/company_pages.py — no need to list them here.
 ]
 
-# ── Google Sheets output ──────────────────────
-# Set SHEETS_ENABLED = False to just output a local CSV instead
-SHEETS_ENABLED = True           # credentials.json is set up and sheet is shared
+# ── Google Sheets (application tracker only) ──
+# Used by api.py for the "Applications" tab. The pipeline never writes jobs here.
 SHEETS_CREDENTIALS_FILE = "credentials.json"   # service account JSON
 SPREADSHEET_NAME = "Job Pipeline"              # exact name of your Sheet
 
-# ── Local CSV fallback (always written) ───────
+# ── Job list (the only place jobs are written) ─
 CSV_OUTPUT_PATH = "data/jobs.csv"
 
 # ── Seen jobs cache (avoid duplicates) ────────

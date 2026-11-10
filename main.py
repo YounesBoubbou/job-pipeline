@@ -12,7 +12,7 @@ from scrapers.indeed import fetch_indeed_jobs
 from scrapers.company_pages import fetch_company_jobs
 from scrapers.targets import fetch_target_jobs
 from ind_checker import job_sponsor_status
-from output import load_seen, save_seen, deduplicate, write_csv, write_sheets
+from output import load_seen, save_seen, deduplicate, write_csv
 
 
 def run():
@@ -56,8 +56,7 @@ def run():
     print(f"  IND sponsor breakdown — Yes: {yes_count} | Unknown: {unknown_count} | No: {no_count}")
 
     # ── 4. Write output ────────────────────────────────────
-    write_csv(new_jobs)
-    write_sheets(new_jobs)
+    write_csv(new_jobs)   # jobs live in the CSV only; the Sheet holds the tracker (P7)
 
     # ── 5. Print digest to terminal ───────────────────────
     print(f"\n{'─'*55}")
