@@ -40,11 +40,7 @@ LOCATIONS = [
     "groningen", "enschede", "zwolle", "deventer", "maastricht", "wageningen",
 ]
 
-# ── Job board search queries ──────────────────
-# Used by Werkzoeken.nl scraper — edit in scrapers/indeed.py → SEARCH_QUERIES
-
 # ── Company career pages to watch ─────────────
-# Note: Picnic and bol.com are fetched via their JSON APIs in the job boards scraper
 # Add more companies here — needs a careers URL and a name
 COMPANY_PAGES = [
     {
@@ -57,7 +53,7 @@ COMPANY_PAGES = [
         "url": "https://werkenbij.surf.nl",
         "keyword_in_url": "surf",
     },
-    # Note: Catawiki, Adyen, TomTom are fetched via Greenhouse API
+    # Note: Catawiki and Adyen are fetched via the Greenhouse API
     # in scrapers/company_pages.py — no need to list them here.
 ]
 
@@ -77,11 +73,8 @@ RUN_SUMMARY_PATH = "data/last_run.json"
 SEEN_CACHE_PATH = "data/seen_jobs.json"
 
 # ── IND sponsor register ──────────────────────
-# Downloaded automatically if not present
+# Scraped from the IND web page by ind_checker.py and cached here; refreshed after 30 days
 IND_REGISTER_PATH = "data/ind_sponsors.csv"
-IND_REGISTER_URL  = (
-    "https://ind.nl/en/documents/02-2022/publiekregister_erkende_referenten_en.xlsx"
-)
 
 # ── ATS resolution (sponsor → careers board) ──
 # Built incrementally by ats_resolver.py — see ADR-0003

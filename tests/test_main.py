@@ -110,6 +110,16 @@ def test_summary_written_when_run_crashes(run_env, monkeypatch):
     assert s["jobs_added"] == 0
 
 
+def test_step_labels_name_the_real_sources(run_env, capsys):
+    main.run()
+
+    out = capsys.readouterr().out
+    assert "Indeed" not in out
+    assert "RemoteOK, Arbeitnow" in out
+    for n in range(1, 6):
+        assert f"[{n}/5]" in out
+
+
 def test_summary_written_when_nothing_new(run_env, monkeypatch):
     monkeypatch.setattr(main, "load_seen", lambda: {JOB["url"]})
 

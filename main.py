@@ -52,9 +52,9 @@ def _run(summary: dict):
     # A source that crashes as a whole is recorded as failed; the others still run (P5).
     all_jobs = []
     sources = (
-        ("Job boards",    "[1/4] Fetching jobs from Indeed RSS...",              fetch_indeed_jobs),
-        ("Company pages", "\n[2/4] Scraping company career pages...",           fetch_company_jobs),
-        ("Target list",   "\n  Fetching target-list boards...",                  fetch_target_jobs),
+        ("Job boards",    "[1/5] Fetching job boards (RemoteOK, Arbeitnow)...",  fetch_indeed_jobs),
+        ("Company pages", "\n[2/5] Scraping company career pages...",           fetch_company_jobs),
+        ("Target list",   "\n[3/5] Fetching target-list boards...",             fetch_target_jobs),
     )
     for label, heading, fetch in sources:
         print(heading)
@@ -72,7 +72,7 @@ def _run(summary: dict):
     print(f"\n  Total raw (pre-dedup): {len(all_jobs)} jobs")
 
     # ── 2. Deduplicate against previous runs ───────────────
-    print("\n[3/4] Deduplicating against seen jobs cache...")
+    print("\n[4/5] Deduplicating against seen jobs cache...")
     seen = load_seen()
     new_jobs = deduplicate(all_jobs, seen)
     save_seen(seen)
@@ -83,7 +83,7 @@ def _run(summary: dict):
         return
 
     # ── 3. Enrich with IND sponsor status ─────────────────
-    print("\n[4/4] Checking IND sponsor register...")
+    print("\n[5/5] Checking IND sponsor register...")
     for job in new_jobs:
         job["ind_sponsor"] = job_sponsor_status(job)
 

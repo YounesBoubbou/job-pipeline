@@ -63,7 +63,8 @@ cannot be finished without him.
 
 ## Follow-ups after first use (Younes, 2026-11-10)
 
-- [ ] **20. Exclude 3+ years, not 5+** (P2, changed by Younes). Committed as `3e7446f`; in review.
+- [!] **20. Exclude 3+ years, not 5+** (P2, changed by Younes). First version committed as
+  `3e7446f` before review; review failed twice, see "Waiting for Younes".
 - [x] **21. Tracker keeps changes made while the Sheet is down.** Files:
   `frontend/src/context/TrackerContext.jsx`. Today a job marked applied (or a status changed)
   while the Sheet is unreachable lives only in the browser and is overwritten by the Sheet's
@@ -75,11 +76,21 @@ cannot be finished without him.
   in Dutch; English postings that say Dutch is required ("fluent in Dutch", "Dutch is a
   must", "native Dutch speaker", "Nederlands vereist") get through. Drop those; keep postings
   where Dutch is only a plus ("Dutch is a plus", "nice to have", "not required").
-- [ ] **23. Code leftovers** (from task 18). `main.py` says "Fetching jobs from Indeed RSS"
+- [x] **23. Code leftovers** (from task 18). `main.py` says "Fetching jobs from Indeed RSS"
   but fetches RemoteOK and Arbeitnow; unused `IND_REGISTER_URL` and stale comments in
   `config.py`. No behaviour change.
 
 ## Waiting for Younes
+
+- **Task 20: years rule failed review twice.** I committed the first version (`3e7446f`, on
+  `mvp`, so it is what the daily run uses) before review, which skipped the process. Round 1
+  found it hides some junior jobs ("2 - 3 years" with spaces, "1.5 years") and misses "3
+  years’ experience" (curly quote), "3 or more years", "three (3) years". Round 2 fixed all of
+  those and is parked on branch `task20-years-round2` (`a8bf940`, not merged). Round 2 review
+  still found three small misses: "a 3-5 year contract", "between 1 and 3 years" and
+  "max / no more than 3 years" would be hidden. The fixes are known and small. Your call:
+  (a) allow a third round (my recommendation): fix those three on the branch, review, merge
+  into `mvp`; (b) merge the branch as is; (c) keep `mvp` as is.
 
 - **ADR-0007 sign-off** (`docs/adr/0007-run-summary-file.md`, status "proposed"). Three readings to
   confirm or overrule: "kept" counts jobs that passed the filters at a board, before removing

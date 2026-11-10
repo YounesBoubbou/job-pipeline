@@ -134,7 +134,8 @@ def _fetch_arbeitnow() -> tuple[list[dict], dict | None, dict | None]:
 
 
 def fetch_indeed_jobs() -> tuple[list[dict], list[dict], list[dict]]:
-    """Main entry point — named for drop-in compatibility with main.py.
+    """Main entry point. The name is historical (Indeed is no longer fetched); it is kept
+    so main.py and the tests need no change.
     Returns (jobs, boards, failed), the same shape as fetch_target_jobs."""
     all_jobs  = []
     seen_urls = set()
