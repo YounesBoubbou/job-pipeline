@@ -69,6 +69,10 @@ SPREADSHEET_NAME = "Job Pipeline"              # exact name of your Sheet
 # ── Job list (the only place jobs are written) ─
 CSV_OUTPUT_PATH = "data/jobs.csv"
 
+# ── Run summary (P1, P5) ──────────────────────
+# Rewritten after every run: times, jobs added, boards tried and boards that failed
+RUN_SUMMARY_PATH = "data/last_run.json"
+
 # ── Seen jobs cache (avoid duplicates) ────────
 SEEN_CACHE_PATH = "data/seen_jobs.json"
 

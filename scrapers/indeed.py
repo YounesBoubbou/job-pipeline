@@ -3,6 +3,9 @@ scrapers/indeed.py — Scrape tech job listings.
 Sources:
   - RemoteOK API  (free, no auth — remote tech jobs worldwide)
   - Arbeitnow API (free, no auth — EU / remote tech jobs)
+
+Each source reports itself for the run summary (P1, P5): a board entry with the number
+of listings fetched and kept, or a failed entry with the reason.
 """
 
 import requests
@@ -20,11 +23,12 @@ HEADERS = {
 TODAY = datetime.today().strftime("%Y-%m-%d")
 
 
-def _fetch_remoteok() -> list[dict]:
+def _fetch_remoteok() -> tuple[list[dict], dict | None, dict | None]:
     """
     RemoteOK — free API, no auth required, all-remote tech jobs.
     https://remoteok.com/api
     First element in the JSON array is metadata, skip it.
+    Returns (jobs, board, None) on success, (jobs, None, error) on failure.
     """
     jobs = []
     try:
@@ -61,19 +65,24 @@ def _fetch_remoteok() -> list[dict]:
                 "description_snippet": strip_html(description),
             })
 
-        print(f"    RemoteOK: {len(jobs)} matching jobs")
+        print(f"    RemoteOK: {len(items)} fetched, {len(jobs)} kept")
+        return jobs, {"name": "RemoteOK", "source": "aggregator",
+                      "fetched": len(items), "kept": len(jobs)}, None
     except Exception as e:
-        print(f"    RemoteOK warning: {e}")
-    return jobs
+        reason = f"{type(e).__name__}: {e}"
+        print(f"    RemoteOK FAILED: {reason}")
+        return jobs, None, {"name": "RemoteOK", "source": "aggregator", "reason": reason}
 
 
-def _fetch_arbeitnow() -> list[dict]:
+def _fetch_arbeitnow() -> tuple[list[dict], dict | None, dict | None]:
     """
     Arbeitnow — free API, no auth, EU & remote tech jobs.
     Only keeps remote=True OR Netherlands-based roles.
     https://arbeitnow.com/api
+    Returns (jobs, board, None) on success, (jobs, None, error) on failure.
     """
     jobs = []
+    fetched = 0  # every listing on every page, before the remote/NL check
     try:
         seen_urls = set()
         for page in range(1, 4):
@@ -83,6 +92,7 @@ def _fetch_arbeitnow() -> list[dict]:
             items = r.json().get("data", [])
             if not items:
                 break
+            fetched += len(items)
 
             for item in items:
                 title       = item.get("title", "")
@@ -114,21 +124,32 @@ def _fetch_arbeitnow() -> list[dict]:
                     "description_snippet": strip_html(description),
                 })
 
-        print(f"    Arbeitnow: {len(jobs)} matching jobs")
+        print(f"    Arbeitnow: {fetched} fetched, {len(jobs)} kept")
+        return jobs, {"name": "Arbeitnow", "source": "aggregator",
+                      "fetched": fetched, "kept": len(jobs)}, None
     except Exception as e:
-        print(f"    Arbeitnow warning: {e}")
-    return jobs
+        reason = f"{type(e).__name__}: {e}"
+        print(f"    Arbeitnow FAILED: {reason}")
+        return jobs, None, {"name": "Arbeitnow", "source": "aggregator", "reason": reason}
 
 
-def fetch_indeed_jobs() -> list[dict]:
-    """Main entry point — named for drop-in compatibility with main.py."""
+def fetch_indeed_jobs() -> tuple[list[dict], list[dict], list[dict]]:
+    """Main entry point — named for drop-in compatibility with main.py.
+    Returns (jobs, boards, failed), the same shape as fetch_target_jobs."""
     all_jobs  = []
     seen_urls = set()
+    boards, failed = [], []
 
-    for job in _fetch_remoteok() + _fetch_arbeitnow():
-        if job["url"] not in seen_urls:
-            seen_urls.add(job["url"])
-            all_jobs.append(job)
+    for fetch in (_fetch_remoteok, _fetch_arbeitnow):
+        jobs, board, error = fetch()
+        if board:
+            boards.append(board)
+        if error:
+            failed.append(error)
+        for job in jobs:
+            if job["url"] not in seen_urls:
+                seen_urls.add(job["url"])
+                all_jobs.append(job)
 
     print(f"  Job boards total (post-filter): {len(all_jobs)} jobs")
-    return all_jobs
+    return all_jobs, boards, failed

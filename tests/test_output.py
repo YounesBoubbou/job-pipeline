@@ -1,3 +1,6 @@
+import json
+
+import output
 from output import deduplicate
 
 
@@ -24,3 +27,16 @@ def test_dedup_drops_posting_seen_in_earlier_run():
 def test_dedup_keeps_different_titles():
     jobs = [_job("https://a/1"), _job("https://a/2", title="Junior ML Engineer")]
     assert len(deduplicate(jobs, set())) == 2
+
+
+def test_write_run_summary_creates_dir_and_valid_json(tmp_path, monkeypatch):
+    path = tmp_path / "sub" / "last_run.json"
+    monkeypatch.setattr(output, "RUN_SUMMARY_PATH", str(path))
+    summary = {"status": "completed", "jobs_added": 1,
+               "failed": [{"name": "Valtech", "source": "target:greenhouse", "reason": "404 — not found"}]}
+
+    output.write_run_summary(summary)
+
+    with open(path, encoding="utf-8") as f:
+        assert json.load(f) == summary
+    assert list(path.parent.iterdir()) == [path]  # no .tmp file left behind

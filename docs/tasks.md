@@ -11,7 +11,7 @@ cannot be finished without him.
 
 - [x] **1. Stop writing job rows to the Sheet** (P7).
   Files: `main.py`, `output.py`, `config.py`. The tracker's use of the Sheet in `api.py` stays.
-- [ ] **2. Run summary file** (P1, P5). **plan**
+- [x] **2. Run summary file** (P1, P5). **plan**
   Write `data/last_run.json` after every run: start and end time, jobs added, and per
   board the number fetched and kept, plus failed boards with the reason. A failing source
   never stops the run. `fetch_target_jobs` in `scrapers/targets.py` already collects
@@ -59,4 +59,7 @@ cannot be finished without him.
 
 ## Waiting for Younes
 
-Nothing yet.
+- **ADR-0007 sign-off** (`docs/adr/0007-run-summary-file.md`, status "proposed"). Three readings to
+  confirm or overrule: "kept" counts jobs that passed the filters at a board, before removing
+  repeats from earlier runs; P1's "run log" is the console output plus the `boards` list in
+  `data/last_run.json`; the file also records `duration_seconds` (read by task 9's 15-minute check).

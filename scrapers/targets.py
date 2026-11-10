@@ -164,9 +164,16 @@ def load_targets(path: str = TARGETS_PATH) -> list[dict]:
         return [{k: (v or "").strip() for k, v in row.items()} for row in csv.DictReader(f)]
 
 
-def fetch_target_jobs() -> list[dict]:
-    """Fetch and filter openings for every target that has a source and token."""
-    jobs, failed, skipped = [], [], []
+def fetch_target_jobs() -> tuple[list[dict], list[dict], list[dict]]:
+    """Fetch and filter openings for every target that has a source and token.
+
+    Returns (jobs, boards, failed). `boards` has one entry per board that answered, with
+    how many listings it returned (`fetched`) and how many passed the filters (`kept`).
+    `failed` has one entry per board that raised, with the reason. A board that fails
+    partway is counted as failed and none of its jobs are kept.
+    """
+    jobs, boards, failed, skipped = [], [], [], []
+    failed_lines = []  # the same failures, worded for the console
 
     for t in load_targets():
         name, source, token = t["company"], t.get("source", "").lower(), t.get("token", "")
@@ -175,40 +182,44 @@ def fetch_target_jobs() -> list[dict]:
             skipped.append(name)
             continue
 
+        board_jobs = []
         try:
             postings = list(FETCHERS[source](token))
-        except Exception as e:
-            failed.append(f"{name} ({source}:{token}) — {e}")
-            continue
-
-        kept = 0
-        for title, location, url, description in postings:
-            if not passes_all(title, location, description):
-                continue
-            # Only fetched for jobs that got this far, to keep the request count down.
-            if not description and source in DESCRIPTION_FETCHERS:
-                description = DESCRIPTION_FETCHERS[source](token, url)
+            for title, location, url, description in postings:
                 if not passes_all(title, location, description):
                     continue
-            kept += 1
-            jobs.append({
-                "title":               title,
-                "company":             name,
-                "ind_registered_name": t.get("ind_registered_name", ""),
-                "location":            location,
-                "url":                 url,
-                "source":              f"Target ({source})",
-                "date_found":          TODAY,
-                "description_snippet": strip_html(description)[:300],
-            })
-        print(f"  {name} ({source}): {len(postings)} listings, {kept} kept")
+                # Only fetched for jobs that got this far, to keep the request count down.
+                if not description and source in DESCRIPTION_FETCHERS:
+                    description = DESCRIPTION_FETCHERS[source](token, url)
+                    if not passes_all(title, location, description):
+                        continue
+                board_jobs.append({
+                    "title":               title,
+                    "company":             name,
+                    "ind_registered_name": t.get("ind_registered_name", ""),
+                    "location":            location,
+                    "url":                 url,
+                    "source":              f"Target ({source})",
+                    "date_found":          TODAY,
+                    "description_snippet": strip_html(description)[:300],
+                })
+        except Exception as e:
+            reason = f"{type(e).__name__}: {e}"
+            failed.append({"name": name, "source": f"target:{source}", "reason": reason})
+            failed_lines.append(f"{name} ({source}:{token}) — {reason}")
+            continue
+
+        jobs.extend(board_jobs)
+        boards.append({"name": name, "source": f"target:{source}",
+                       "fetched": len(postings), "kept": len(board_jobs)})
+        print(f"  {name} ({source}): {len(postings)} listings, {len(board_jobs)} kept")
 
     if skipped:
         print(f"  Skipped {len(skipped)} targets with no source/token")
     if failed:
         print(f"\n  !! {len(failed)} BOARD(S) FAILED — check these rows in targets.csv:")
-        for f in failed:
-            print(f"     {f}")
+        for line in failed_lines:
+            print(f"     {line}")
 
     print(f"  Targets total (post-filter): {len(jobs)} jobs")
-    return jobs
+    return jobs, boards, failed

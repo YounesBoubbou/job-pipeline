@@ -74,10 +74,11 @@ def _extract_job_links(soup: BeautifulSoup, base_url: str) -> list[dict]:
     return results
 
 
-def _fetch_greenhouse(company_name: str, gh_slug: str) -> list[dict]:
+def _fetch_greenhouse(company_name: str, gh_slug: str) -> tuple[list[dict], dict | None, dict | None]:
     """
     Fetch jobs from the Greenhouse public JSON API.
     No auth required. Returns full job list with title, location, and absolute URL.
+    Returns (jobs, board, None) on success, (jobs, None, error) on failure.
     """
     jobs = []
     try:
@@ -85,7 +86,6 @@ def _fetch_greenhouse(company_name: str, gh_slug: str) -> list[dict]:
         r = requests.get(api_url, headers=HEADERS, timeout=15)
         r.raise_for_status()
         items = r.json().get("jobs", [])
-        print(f"  {company_name} (Greenhouse): {len(items)} listings found")
 
         for item in items:
             title    = item.get("title", "")
@@ -108,18 +108,28 @@ def _fetch_greenhouse(company_name: str, gh_slug: str) -> list[dict]:
                 "description_snippet": strip_html(content),
             })
 
+        print(f"  {company_name} (Greenhouse): {len(items)} fetched, {len(jobs)} kept")
+        return jobs, {"name": company_name, "source": "careers:greenhouse",
+                      "fetched": len(items), "kept": len(jobs)}, None
     except Exception as e:
-        print(f"  Warning: Greenhouse fetch failed for {company_name} — {e}")
-    return jobs
+        reason = f"{type(e).__name__}: {e}"
+        print(f"  {company_name} (Greenhouse) FAILED: {reason}")
+        return jobs, None, {"name": company_name, "source": "careers:greenhouse", "reason": reason}
 
 
-def fetch_company_jobs() -> list[dict]:
-    """Scrape all configured company career pages."""
-    jobs = []
+def fetch_company_jobs() -> tuple[list[dict], list[dict], list[dict]]:
+    """Scrape all configured company career pages.
+    Returns (jobs, boards, failed), the same shape as fetch_target_jobs."""
+    jobs, boards, failed = [], [], []
 
     # ── Greenhouse companies (JSON API — fast and reliable) ────────────────
     for name, slug in GREENHOUSE_COMPANIES.items():
-        jobs.extend(_fetch_greenhouse(name, slug))
+        gh_jobs, board, error = _fetch_greenhouse(name, slug)
+        jobs.extend(gh_jobs)
+        if board:
+            boards.append(board)
+        if error:
+            failed.append(error)
 
     # ── HTML-scraped career pages (from config.py COMPANY_PAGES) ──────────
     for company in COMPANY_PAGES:
@@ -136,7 +146,7 @@ def fetch_company_jobs() -> list[dict]:
             soup = BeautifulSoup(r.text, "html.parser")
 
             candidates = _extract_job_links(soup, url)
-            print(f"  {name}: {len(candidates)} links found on careers page")
+            kept = 0
 
             for c in candidates:
                 title = c["title"]
@@ -145,6 +155,7 @@ def fetch_company_jobs() -> list[dict]:
                 if not passes_all(title, location="Netherlands"):
                     continue
 
+                kept += 1
                 jobs.append({
                     "title":               title,
                     "company":             name,
@@ -155,8 +166,14 @@ def fetch_company_jobs() -> list[dict]:
                     "description_snippet": "",
                 })
 
+            boards.append({"name": name, "source": "careers:html",
+                           "fetched": len(candidates), "kept": kept})
+            print(f"  {name}: {len(candidates)} fetched, {kept} kept")
+
         except Exception as e:
-            print(f"  Warning: could not scrape {name} ({url}) — {e}")
+            reason = f"{type(e).__name__}: {e}"
+            failed.append({"name": name, "source": "careers:html", "reason": reason})
+            print(f"  {name} ({url}) FAILED: {reason}")
 
     print(f"  Company pages total (post-filter): {len(jobs)} jobs")
-    return jobs
+    return jobs, boards, failed
