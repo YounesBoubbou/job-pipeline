@@ -26,6 +26,6 @@ export const DEFAULT_FILTERS = {
   roles:      [],
   seniority:  true,
   language:   true,
-  indSponsor: false,
+  indSponsor: true,   // W4: sponsors only is on by default
   education:  false,
 }
