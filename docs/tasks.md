@@ -88,13 +88,20 @@ cannot be finished without him.
   `heineken` fetcher). Fetch each job's page for its description, obeying the site's
   5-second crawl delay, only for jobs that pass the title and location filters (as Workday
   does), so the Dutch and years rules apply to Heineken too. Report the extra run time.
-- [ ] **25. NXP board** (P5). Its Workday board answers 422. Find where NXP now publishes
+- [x] **25. NXP board** (P5). Its Workday board answers 422. Find where NXP now publishes
   jobs, confirm it is NXP, and fix its `targets.csv` row. If no readable board exists, set
-  it to `none` and say so below.
-- [ ] **26. Three dead Recruitee boards** (P5). Payconiq, 50five and Leiden University answer
-  404. Same as task 25 for each.
+  it to `none` and say so below. *Done 2026-11-11: moved to `nxp.myworkdayjobs.com/careers`
+  (no `wd3.`), 39 Dutch jobs.*
+- [x] **26. Three dead Recruitee boards** (P5). Payconiq, 50five and Leiden University answer
+  404. Same as task 25 for each. *Done 2026-11-11: all three set to `none`, see below.*
 
 ## Waiting for Younes
+
+- **FYI, three boards set to `none` (task 26).** Payconiq: the company is being renamed
+  Bancontact Company (Belgian) and takes applications by e-mail. 50five: jobs are plain pages
+  on its own site, applications by e-mail; reading it needs a new fetcher. Leiden University:
+  now on `careers.universiteitleiden.nl`, which runs SAP SuccessFactors, a system the pipeline
+  can't read yet (other universities may use it too). Say if you want either fetcher built.
 
 - **Task 17: check tomorrow.** The task is registered (2026-11-11, daily 08:00). P8 passes
   when `data\last_run.json` shows a `started_at` after 08:00 on 2026-11-12 without a manual
