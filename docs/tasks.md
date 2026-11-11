@@ -117,9 +117,8 @@ cannot be finished without him.
   that's a plus", "Dutch is appreciated" are still dropped.
 - **FYI, no way to remove an application from the tracker** (task 15), in the app or the
   API; delete the row in the Sheet.
-- **GitHub after you push `mvp` (task 16, Q4).** Check the "Tests" workflow goes green on the
-  Actions tab. Optional: the Sheets secrets under Settings > Secrets and variables > Actions
-  are unused now, and old `seen-jobs-*` / `ind-register-*` caches can be deleted.
+- **Q4 passes (2026-11-11).** The "Tests" workflow ran green on `master` after Younes removed
+  a $0 Actions budget with "stop usage" on, which had locked every GitHub Actions job.
 - **FYI, ASML robots.txt (task 7, went ahead).** `asml.wd3.myworkdayjobs.com/robots.txt`
   disallows the board's web pages (`/ASMLEXT1/`). The pipeline reads only the JSON API
   (`/wday/cxs/asml/ASMLEXT1/...`), which is not disallowed, as with the other Workday boards.
