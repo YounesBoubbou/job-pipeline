@@ -13,7 +13,7 @@ cannot be finished without him.
 - [ ] **A-1. ADR for the scan** (Q4). `docs/adr/0013-careers-page-scan.md`: the new
   `targets.csv` columns (`website`, `careers_url`, `ats_seen`, `ats_evidence`, `scan_note`),
   the `ats_seen` values of A4, the politeness rules of A6, and how the scan resumes (A9).
-- [ ] **A-2. Scan script** (A2 step 1, A3, A4, A5, A6, A9). **plan** New `coverage_scan.py`
+- [!] **A-2. Scan script** (A2 step 1, A3, A4, A5, A6, A9). **plan** New `coverage_scan.py`
   at the repo root (same style as `ats_resolver.py`). Guess-and-verify websites, find the
   careers page, detect the system from links, frames, scripts and redirects, note
   `JobPosting` data, obey robots.txt and the request limits, save after every company and
@@ -46,4 +46,11 @@ One task: `docs/coverage-final-report.md` (D1).
 
 ## Waiting for Younes
 
-(nothing yet)
+- **A-2 failed review twice (2026-11-11).** Round 1 found parked "for sale" domains accepted
+  as company websites, reCAPTCHA read as a bot wall, and undocumented changes; all fixed.
+  Round 2 found two new, small defects in that fix: (1) three parked-domain words can never
+  match because of a typo (control characters instead of word boundaries), and a plain
+  "domain" word would wrongly reject real companies like SIDN; (2) companies named after their
+  domain (Booking.com, Aanmelder.nl, Smartly.io) are now rejected. Both fixes are known and
+  small. Your call: (a) allow a third round (recommended): fix both, review, then start the
+  scan; (b) stop here.
