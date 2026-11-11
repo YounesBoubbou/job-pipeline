@@ -73,19 +73,20 @@ Jobs live in `data/jobs.csv` only.
 *Check:* a full run makes no Google Sheets request.
 
 **P8. Runs every morning by itself.** A Windows scheduled task (Windows' built-in timer for
-running programs) starts the pipeline each weekday morning without Younes doing anything.
+running programs) starts the pipeline every morning at 08:00 without Younes doing anything.
 *Check:* the task exists, and a summary file dated that morning appears without a manual run.
 
-**P9. Big employers.** Jobs from these eleven employers are fetched in every run. First
-priority: ASML, Booking.com, ABN AMRO, Rabobank. Then: Heineken, Signify, TomTom, Ahold
+**P9. Big employers.** Jobs from these ten employers are fetched in every run. First
+priority: ASML, Booking.com, ABN AMRO. Then: Heineken, Signify, TomTom, Ahold
 Delhaize, HSBC, DSM (dsm-firmenich), AkzoNobel. Each gets a `targets.csv` row with status
 `hand`, after confirming by hand that the board belongs to the right company. Several run
 their own careers sites instead of one of the six supported kinds, so new fetchers are
-expected.
-*Check:* the summary file of a full run lists each of the eleven with at least one job
+expected. *Rabobank was dropped by Younes on 2026-11-11: every Rabobank careers site blocks
+automated access.*
+*Check:* the summary file of a full run lists each of the ten with at least one job
 fetched (counted before filtering). If an employer's site cannot be read by a program
 (it blocks automated access, or its terms forbid it), the builder stops and reports that
-employer to Younes, who decides. The MVP is not done until all eleven are either fetched
+employer to Younes, who decides. The MVP is not done until all ten are either fetched
 or decided by him.
 
 ### The web app
@@ -155,7 +156,7 @@ actually works when the MVP is done.
 Proposed by Claude and confirmed by Younes on 2026-11-10:
 
 1. **P6:** the limit is 15 minutes.
-2. **P8:** the run starts at 08:00 on weekdays.
+2. **P8:** the run starts at 08:00 every day (changed from weekdays by Younes, 2026-11-11).
 3. **Section 5:** work lands on the `mvp` branch and Younes merges it.
 4. **Q4:** the GitHub job only runs the tests.
 5. **W3:** "new" means added by the most recent run, not "new since you last looked".

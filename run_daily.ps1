@@ -2,7 +2,7 @@
 #
 #   powershell -NoProfile -ExecutionPolicy Bypass -File .\run_daily.ps1
 #
-# Meant for the Windows scheduled task that starts the pipeline every weekday at
+# Meant for the Windows scheduled task that starts the pipeline every day at
 # 08:00, so it needs no console and no one watching. Everything the pipeline
 # prints (output and errors) goes to logs\run_YYYY-MM-DD_HHmm.log. Logs older than
 # 30 days are deleted. The script exits with the pipeline's exit code, so Task

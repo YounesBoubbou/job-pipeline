@@ -2,7 +2,7 @@
 
 Date: 2026-11-10
 
-Status: proposed. Amends the meaning of `fetched` in
+Status: accepted by Younes, 2026-11-11. Amends the meaning of `fetched` in
 [0007](0007-run-summary-file.md) for Workday boards. Younes can overrule any point below.
 
 ## Context

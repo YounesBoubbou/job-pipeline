@@ -2,7 +2,7 @@
 
 Date: 2026-11-10
 
-Status: proposed. Younes can overrule any point below.
+Status: accepted by Younes, 2026-11-11.
 
 ## Context
 

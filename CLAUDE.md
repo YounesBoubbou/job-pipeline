@@ -39,7 +39,7 @@ Current: 13 Python modules (9 at the root, 4 in `scrapers/`; the CV and cover-le
 generators are outside the MVP) and 10 test files in `tests/` (run
 `venv\Scripts\python.exe -m pytest`). Jobs go to `data/jobs.csv` only, with a run summary
 in `data/last_run.json`; the Google Sheet holds only the application tracker. Runs on
-Younes's PC each weekday at 08:00 via a Windows scheduled task (`run_daily.ps1`, logs in
+Younes's PC every day at 08:00 via a Windows scheduled task (`run_daily.ps1`, logs in
 `logs/`). Web app: FastAPI (`api.py`) + React/Vite (`frontend/`), started by `start.ps1`,
 reachable from a phone on the home Wi-Fi. GitHub Actions runs the tests only.
 Target: hardened extraction, CI gates, orchestration.

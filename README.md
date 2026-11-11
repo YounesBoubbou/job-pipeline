@@ -2,7 +2,7 @@
 
 A personal job-hunting tool for English-language, entry-level tech jobs in the Netherlands.
 
-- The **pipeline** (a Python program) collects job openings every weekday morning, keeps the
+- The **pipeline** (a Python program) collects job openings every morning, keeps the
   ones that pass the filters, labels each with whether the company is a visa sponsor, and
   appends the new ones to `data/jobs.csv`.
 - The **web app** shows those jobs on the PC or on a phone at home, and tracks the ones you
@@ -42,7 +42,7 @@ Open decisions and to-dos are listed in `docs/tasks.md` under "Waiting for Youne
 ## How it works
 
 ```
- Windows scheduled task, weekdays 08:00  ──▶  run_daily.ps1  ──▶  python main.py
+ Windows scheduled task, daily 08:00    ──▶  run_daily.ps1  ──▶  python main.py
                                                                        │
    targets.csv (1,045 companies, main source) ──┐                      │
    RemoteOK + Arbeitnow (job-board sites)     ──┼──▶ filters ──▶ remove repeats ──▶ IND sponsor label
@@ -97,14 +97,32 @@ kept, then the new jobs. On the first run it also downloads the IND sponsor regi
 A board that fails (not found, time-out, network down) does not stop the run: it is listed in
 the console and in `data/last_run.json`.
 
-## Run it every weekday by itself
+## Run it every day by itself
 
 `run_daily.ps1` runs the pipeline once and saves everything it prints to a log file. A
-Windows scheduled task (Windows' built-in timer for running programs) starts it every weekday
-at 08:00. The command that registers the task, and the commands to check, test and remove it,
-are in `docs/tasks.md` under "Waiting for Younes", item "Task 17". It runs only while you are
-signed in (a locked screen is fine). If the PC is off or asleep at 08:00, it runs as soon as
-the PC is back.
+Windows scheduled task (Windows' built-in timer for running programs) starts it every day
+at 08:00. It runs only while you are signed in (a locked screen is fine). If the PC is off
+or asleep at 08:00, it runs as soon as you are back; it does not wake the PC.
+
+Register it once, in a normal PowerShell window (no admin needed):
+
+```powershell
+$Repo = 'C:\Users\Younes\Desktop\job-pipeline'
+$action = New-ScheduledTaskAction -Execute 'powershell.exe' `
+    -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$Repo\run_daily.ps1`"" `
+    -WorkingDirectory $Repo
+$trigger = New-ScheduledTaskTrigger -Daily -At 08:00
+$trigger.StartBoundary = (Get-Date '08:00').ToString('s')   # local 08:00, also in summer time
+$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Hours 1) `
+    -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew
+$principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Limited
+Register-ScheduledTask -TaskName 'Job Pipeline daily' -Action $action -Trigger $trigger `
+    -Settings $settings -Principal $principal -Description 'Runs the job pipeline every day at 08:00.'
+```
+
+- Check: `Get-ScheduledTask -TaskName 'Job Pipeline daily'` (state `Ready`)
+- Test once: `Start-ScheduledTask -TaskName 'Job Pipeline daily'`, then open the newest file in `logs\`
+- Remove: `Unregister-ScheduledTask -TaskName 'Job Pipeline daily' -Confirm:$false`
 
 **Logs:** `logs\run_YYYY-MM-DD_HHmm.log`, one per scheduled run, ending with the exit code
 (`0` = worked). Logs older than 30 days are deleted. A run started by hand with `main.py`
