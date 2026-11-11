@@ -33,8 +33,21 @@ cannot be finished without him.
 
 ## Phase B: boards on systems already read
 
-Written in full after the phase A report. Outline: B1-B2 fill and fetch, B3 settle every
-`review` and blank row (Younes spot-checks 15), B4 fetch of the new boards, T1 timing.
+Started early, before A-4 to A-7, by Younes's decision on 2026-11-11: the scan found 74
+rows on systems we already read, and scored 45/183 on known rows against the 80% of A7
+("lets add the 74 companies. thats still ok tbh"). A7 stays open; A-4 to A-7 follow.
+
+- [x] **B-1. Fill and fetch the new boards** (B1, B2, B4, B5). **plan** For each row that is
+  not `auto`/`hand` and whose `ats_seen` is one of the 12 kinds: token from `ats_evidence`
+  (`token_from_evidence`), written to `source`/`token`; one fetch through `FETCHERS`;
+  status by ADR-0006 (reuse `ats_resolver.py` logic); no token or a failed fetch leaves the
+  row out with the reason in `scan_note`. Old `auto`/`hand` rows untouched (B5). Tests with
+  fake boards. Run it in the worktree; attach the summary of that fetch.
+- [ ] **B-2. Settle review rows** (B3). Agent settles every `review` and blank row with
+  evidence in `scan_note`; list 15 new `hand` rows for Younes to spot-check.
+- [ ] **B-3. Full run timing** (T1). A full pipeline run in the worktree (its own `data/`,
+  no Google Sheets write) in 30 minutes or less; parallel fetches across sites if needed.
+- [ ] **B-4. Phase B report** for Younes, who merges `coverage` into `mvp`.
 
 ## Phase C: new readers
 

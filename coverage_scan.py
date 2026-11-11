@@ -253,11 +253,14 @@ def is_vendor_url(url: str) -> bool:
 
 
 _SUB = r"//(?:[\w-]+\.)*"  # any subdomains
+# Recruitee's own subdomains, not company boards. careers-analytics is on every
+# Recruitee-hosted careers page, whoever the company (ADR-0014).
+RECRUITEE_NOT_BOARD = r"(?!(?:www|app|api|cdn|careers|blog|careers-analytics)\.)"
 
 # (kind, pattern on a full address). Order does not matter; priority is decided in _choose.
 URL_PATTERNS = [
     ("greenhouse", r"//(?:boards|job-boards)(?:\.eu)?\.greenhouse\.io/|//boards-api\.greenhouse\.io/v1/boards/|[?&]gh_jid=\d"),
-    ("recruitee", r"//(?!(?:www|app|api|cdn|careers|blog)\.)[a-z0-9-]+\.recruitee\.com"),
+    ("recruitee", r"//" + RECRUITEE_NOT_BOARD + r"[a-z0-9-]+\.recruitee\.com"),
     ("lever", r"//(?:jobs|api)\.lever\.co/"),
     ("lever_eu", r"//(?:jobs|api)\.eu\.lever\.co/"),
     ("ashby", r"//jobs\.ashbyhq\.com/|//api\.ashbyhq\.com/posting-api/job-board/"),
@@ -345,7 +348,7 @@ def token_from_evidence(kind: str, evidence: str) -> str:
              or re.search(r"boards-api\.greenhouse\.io/v1/boards/([\w-]+)", evidence))
         return m.group(1) if m and m.group(1) != "embed" else ""
     if kind == "recruitee":
-        m = (re.search(r"//(?!(?:www|app|api|cdn|careers|blog)\.)([a-z0-9-]+)\.recruitee\.com", evidence)
+        m = (re.search(r"//" + RECRUITEE_NOT_BOARD + r"([a-z0-9-]+)\.recruitee\.com", evidence)
              or re.search(r'"subdomain"\s*:\s*"([a-z0-9-]+)"', evidence))
         return m.group(1) if m else ""
     if kind in ("lever", "lever_eu"):
