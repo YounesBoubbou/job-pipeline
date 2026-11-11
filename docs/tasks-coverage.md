@@ -43,7 +43,7 @@ rows on systems we already read, and scored 45/183 on known rows against the 80%
   status by ADR-0006 (reuse `ats_resolver.py` logic); no token or a failed fetch leaves the
   row out with the reason in `scan_note`. Old `auto`/`hand` rows untouched (B5). Tests with
   fake boards. Run it in the worktree; attach the summary of that fetch.
-- [ ] **B-2. Settle review rows** (B3). Agent settles every `review` and blank row with
+- [x] **B-2. Settle review rows** (B3). Agent settles every `review` and blank row with
   evidence in `scan_note`; list 15 new `hand` rows for Younes to spot-check.
 - [ ] **B-3. Full run timing** (T1). A full pipeline run in the worktree (its own `data/`,
   no Google Sheets write) in 30 minutes or less; parallel fetches across sites if needed.
