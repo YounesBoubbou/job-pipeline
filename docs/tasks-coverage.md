@@ -45,9 +45,9 @@ rows on systems we already read, and scored 45/183 on known rows against the 80%
   fake boards. Run it in the worktree; attach the summary of that fetch.
 - [x] **B-2. Settle review rows** (B3). Agent settles every `review` and blank row with
   evidence in `scan_note`; list 15 new `hand` rows for Younes to spot-check.
-- [ ] **B-3. Full run timing** (T1). A full pipeline run in the worktree (its own `data/`,
+- [x] **B-3. Full run timing** (T1). A full pipeline run in the worktree (its own `data/`,
   no Google Sheets write) in 30 minutes or less; parallel fetches across sites if needed.
-- [ ] **B-4. Phase B report** for Younes, who merges `coverage` into `mvp`.
+- [x] **B-4. Phase B report** for Younes, who merges `coverage` into `mvp`.
 
 ## Phase C: new readers
 
