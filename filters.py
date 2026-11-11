@@ -29,16 +29,29 @@ _ANY_NUM = (r"(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twe
 _PAREN = r"(?:\s*\(\d+\))?"
 # "years", "yrs", "years'", "years’" (straight or curly apostrophe)
 _YRS = r"(?:years?|yrs?)\b['’]?"
-# The number is not the top end of a range ("2-3", "2 - 3", "2 to 3", "2 or 3"), not the
-# decimal part of "1.5", and not a ceiling ("less than 3", "under 3", "up to 3")
+# The number is not the top end of a range ("2-3", "2 - 3", "2 to 3", "2 or 3",
+# "between 1 and 3"), not the decimal part of "1.5", and not a ceiling ("less than 3",
+# "under 3", "up to 3", "max 3", "maximum of 3", "no more than 3", "at most 3")
 _NOT_RANGE_END = (r"(?<![\d\-–.])(?<![\-–]\s)(?<![\-–]\s\s)(?<!to\s)(?<!or\s)"
-                  r"(?<!less than\s)(?<!under\s)\b")
+                  r"(?<!between\s\d\sand\s)(?<!between\s\d\.\d\sand\s)"
+                  r"(?<!between\sone\sand\s)(?<!between\stwo\sand\s)"
+                  r"(?<!less than\s)(?<!under\s)(?<!max\s)(?<!max\.\s)(?<!maximum\s)"
+                  r"(?<!maximum of\s)(?<!no more than\s)(?<!not more than\s)(?<!at most\s)\b")
+# "3-5", "3 to 5" ("and" only counts after "between", so "MBO 4 and 2 years" is no range)
 _RANGE = rf"\s*(?:[\-–]|to)\s*{_ANY_NUM}"
+# Not the length of a contract: "a 3-5 year contract", "3-5 year (fixed-term) contract",
+# at most one word in between and not "of"/"experience", so "3-5 years of contract
+# experience" and "3-5 years experience, contract: permanent" still count
+_NOT_CONTRACT = (r"(?!['’]?[\s\-]+(?:(?!of\b|experience\b)\(?[a-z\-]+\)?\s+)?"
+                 r"contract\b(?!\s+experience))")
 _YEARS_REQUIRED = re.compile(
     # "3+ years", "5 plus years", "3 or more years": always a minimum
     rf"{_NOT_RANGE_END}{_NUM}{_PAREN}\s*(?:\+|plus|or\s+more)\s*{_YRS}"
-    # "3-5 years", "5–7 yrs", "three to five years": a range of years is a requirement
-    rf"|{_NOT_RANGE_END}{_NUM}{_RANGE}[\s\-]*{_YRS}"
+    # "3-5 years", "5–7 yrs", "three to five years": a range of years is a requirement,
+    # unless it is the length of a contract
+    rf"|{_NOT_RANGE_END}{_NUM}{_RANGE}[\s\-]*{_YRS}{_NOT_CONTRACT}"
+    # "between 3 and 5 years", "between three and five years"
+    rf"|\bbetween\s+{_NUM}{_PAREN}\s+and\s+{_ANY_NUM}[\s\-]*{_YRS}{_NOT_CONTRACT}"
     # "3 years of experience", "three (3) years experience", "4 yrs' hands-on experience"
     rf"|{_NOT_RANGE_END}{_NUM}{_PAREN}[\s\-]*{_YRS}\s+(?:of\s+)?(?:\S+\s+){{0,2}}?experience"
     # "at least 3 years", "minimum of three (3) years", "min. 4 yrs"

@@ -127,6 +127,19 @@ def test_exclude_rejects_three_or_more_years():
         "Over 3 years of experience",
         "3 years hands-on experience",
         "1-2 years; 3+ years is a plus",
+        # near the round-3 keep cases, still 3 or more years asked
+        "3-5 years of experience on a contract basis",
+        "Between 3 and 5 years of experience",
+        "Between three and five years of experience",
+        "More than 3 years of experience",
+        "Minimum of 3 years of experience",
+        # round 4: "contract" here is the kind of experience, not a contract length
+        "3-5 years of contract experience",
+        "3-5 years contracting experience",
+        "3-5 years experience, contract type: permanent",
+        "3-5 years experience; contract: permanent",
+        "Requirements: 3-5 years experience Contract: full-time",
+        "3-5 years experience contract",
     ]:
         assert not passes_exclude("Data Engineer", text), text
 
@@ -155,6 +168,26 @@ def test_exclude_keeps_junior_year_requirements():
         "A 3-year contract",
         "30 years of history",
         "3 days a week, 2 years of experience",
+        # round 3: a contract length, a range starting below 3, a ceiling
+        "A 3-5 year contract",
+        "A 3 to 5 year fixed-term contract",
+        "3-5 years' contract, 2 years of experience",
+        "Between 1 and 3 years of experience",
+        "Between 2 and 3 years of experience",
+        "Between one and three years of experience",
+        "Max 3 years of experience",
+        "Max. 3 years of experience",
+        "No more than 3 years of experience",
+        "Not more than 3 years of experience",
+        "Maximum of 3 years of experience",
+        "Maximum 3 years experience",
+        "3-5 year (fixed-term) contract",
+        # round 4: "N and M" is only a range after "between"
+        "MBO 4 and 2 years of experience",
+        "MBO level 4 and 2 years of work experience",
+        "Python 3 and 1 year of experience",
+        "Experience with Python 3 and 2 years in a data role",
+        "Team of 5 and 2 years of experience",
     ]:
         assert passes_exclude("Data Engineer", text), text
 
