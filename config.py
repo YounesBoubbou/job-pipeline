@@ -31,6 +31,44 @@ KEYWORDS_EXCLUDE = [
 # Checked against the title and description, on top of the "3 or more years" pattern in filters.py
 EXPERIENCE_EXCLUDE = ["3+ years", "4+ years", "5+ years", "7+ years", "10+ years"]
 
+# "Dutch" meant as the language, not as an adjective: it ends the sentence or is followed by
+# words like "language", "and English", "is", "written", "skills". So "fluent in Dutch" and
+# "fluent Dutch, written and spoken" count, but "knowledge of the Dutch market" does not.
+_DUTCH_LANGUAGE = (
+    r"dutch(?=\s*(?:$|[,().!?;:]|(?:language|and\s+english|&\s*english|is|are|written|spoken|both"
+    r"|fluently|skills|speakers?|at|as|level|required|mandatory|essential)\b))"
+)
+
+# Ways a posting says Dutch is required; regex pieces, matched per sentence on lowercase text,
+# with "-" turned into " " and the ":" after "Dutch", "English" or "Language(s)" dropped.
+# Bare "Dutch speaking" is left out on purpose, so "our Dutch-speaking customers" is kept.
+DUTCH_REQUIRED = [
+    r"(?:fluent|fluency|proficient|proficiency|command|knowledge|mastery)\s+(?:in|of)\s+(?:(?:both|the|english|and|&|,)\s*)*" + _DUTCH_LANGUAGE,
+    r"(?:fluent|native|excellent|proficient|business level|native level)\s+" + _DUTCH_LANGUAGE,
+    # "you speak Dutch", "must speak and write Dutch"; not "we speak Dutch" or "our team speaks Dutch"
+    r"(?<!\bwe )(?<!team )\b(?:speak|write|master)\s+(?:(?:and|&|write|fluent|the)\s+)*" + _DUTCH_LANGUAGE,
+    r"skills\s+in\s+(?:(?:both|english|and|&|,)\s*)*" + _DUTCH_LANGUAGE,
+    r"dutch\s+(?:and|&)\s+english\s+(?:language\s+)?skills",
+    r"dutch\s*(?:at\s+)?\(?\s*[abc][12]\b",   # "Dutch (C1)", "Dutch at B2 level"
+    # language lines: "Dutch: fluent", "Dutch (native) and English", "Dutch and English (fluent)"
+    r"dutch\s*(?:(?:and|&)\s*english\s*)?[:(]?\s*(?:fluent|native)\b",
+    r"dutch\s+(?:native\s+)?speaker\b|dutch\s+(?:language\s+)?(?:skills|proficiency|fluency)",
+    r"(?:english\s+(?:and|&)\s+)?dutch(?:\s+(?:and|&)\s+english)?\s+(?:(?:speaking|language|skills)\s+)*(?:is|are)\s+(?:a\s+)?(?:must|required|mandatory|essential|requirement)",
+    r"dutch\s+(?:required|mandatory|essential)",
+    r"nederlands\w*\s+(?:is\s+)?(?:vereist|verplicht)|vloeiend\s+nederlands|nederlandstalig",
+]
+
+# Whole words that make a Dutch mention only a wish, so the job is kept. They count when they are in
+# the comma-separated part of the sentence that names Dutch, or in the heading above it ("Nice to have").
+DUTCH_OPTIONAL = [
+    "plus", "pluses", "nice to have", "nice to haves", "advantage", "advantageous", "bonus",
+    "preferred", "preferable", "preferably", "ideally", "desirable", "beneficial", "helpful",
+    "optional", "welcome", "asset", "or not", "not required", "not a requirement",
+    "not necessary", "not needed", "not mandatory", "not a must", "not essential",
+    "not a prerequisite", "don't need", "do not need", "no need", "don't have to",
+    "do not have to", "don't require", "does not require", "no dutch", "pluspunt",
+]
+
 # ── Location filter ───────────────────────────
 LOCATIONS = [
     "netherlands", "nederland", "nl", "holland", "hybrid", "remote",

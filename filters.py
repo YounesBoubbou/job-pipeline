@@ -5,7 +5,10 @@ filters.py — Keyword and location filtering for job postings.
 import html
 import re
 
-from config import KEYWORDS_INCLUDE, KEYWORDS_EXCLUDE, EXPERIENCE_EXCLUDE, LOCATIONS
+from config import (
+    KEYWORDS_INCLUDE, KEYWORDS_EXCLUDE, EXPERIENCE_EXCLUDE, LOCATIONS,
+    DUTCH_REQUIRED, DUTCH_OPTIONAL,
+)
 
 # Normalise the text first
 def _normalise(text: str) -> str:
@@ -98,6 +101,72 @@ def passes_language(title: str, description: str = "") -> bool:
     english = sum(w in _ENGLISH_WORDS for w in words)
     return dutch <= english
 
+# One sentence saying Dutch is required ("fluent in Dutch", "Dutch is a must", "Dutch (C1)")
+_DUTCH_REQUIRED = re.compile("|".join(DUTCH_REQUIRED))
+# HTML tags that start or end a line: paragraphs, headings, list items, table cells and rows
+_LINE_TAG = re.compile(
+    r"</?(?:p|div|h[1-6]|ul|ol|table|tr)\b[^>]*>|</(?:li|td)\s*>|<br\s*/?>", re.IGNORECASE
+)
+# A list item becomes a "- " line, so it is never taken for a heading
+_LIST_ITEM = re.compile(r"<li\b[^>]*>", re.IGNORECASE)
+# A list item line: "- x", "* x", "1. x" ("•" and "·" are turned into "- " first)
+_BULLET = re.compile(r"\s*(?:[-*–+]|\d+[.)])(?:\s|$)")
+# One part of a line, ending in . ! ? ; or : — a part ending in ":" is a label ("Nice to have:")
+_SEGMENT = re.compile(r"[^.!?;:]+[.!?;:]?")
+# The ":" after these words is dropped, so "Dutch: fluent" and "Language: Dutch" stay one part
+_LANGUAGE_COLON = re.compile(r"\b(dutch|english|languages?)\s*:")
+
+# True if one of the DUTCH_OPTIONAL words is in the text
+def _says_optional(text: str) -> bool:
+    return any(_contains_word(text, phrase) for phrase in DUTCH_OPTIONAL)
+
+# Only the comma-separated parts that name Dutch count, so in "Fluent in Dutch, German is a plus"
+# the "plus" is about German
+def _dutch_is_optional(segment: str) -> bool:
+    clauses = segment.split(",")
+    dutch_clauses = [c for c in clauses if "dutch" in c or "nederlands" in c] or clauses
+    return any(_says_optional(c) for c in dutch_clauses)
+
+def _requires_dutch(text: str) -> bool:
+    """
+    Plain text, one item per line. True if a part of it asks for Dutch and neither that part
+    nor the heading above it calls Dutch optional. A heading is a label ending in ":"
+    ("Nice to have:", "What we ask:") or a short line that isn't a list item ("Requirements").
+    A heading on its own line covers the lines below it, up to the next heading; a label with
+    text after it covers the rest of its line.
+    """
+    text = re.sub(r"[•·]", "\n- ", text.lower().replace("’", "'").replace("_", " "))
+    section_optional = False    # under a heading like "Nice to have", until the next heading
+    for line in text.split("\n"):
+        is_item = _BULLET.match(line) is not None
+        line = _LANGUAGE_COLON.sub(r"\1 ", line.replace("-", " "))
+        segments = [s.strip() for s in _SEGMENT.findall(line) if s.strip()]
+        optional = section_optional
+        for i, segment in enumerate(segments):
+            required = _DUTCH_REQUIRED.search(segment) is not None
+            short_line = (
+                not is_item and len(segments) == 1 and len(segment.split()) <= 5
+                and segment[-1] not in ".!?;" and not required
+            )
+            if segment.endswith(":") or short_line:
+                optional = _says_optional(segment)
+                if i == len(segments) - 1:
+                    section_optional = optional
+            if required and not optional and not _dutch_is_optional(segment):
+                return True
+    return False
+
+# Filter out English postings that require Dutch; "Dutch is a plus" or a "Nice to have" heading keeps it
+def passes_dutch_requirement(title: str, description: str = "") -> bool:
+    """Returns False if the posting asks for Dutch and doesn't call it optional."""
+    text = html.unescape(html.unescape(description))   # some boards escape their HTML twice
+    if re.search(r"<[a-z/][^>]*>", text, re.IGNORECASE):
+        # HTML: line breaks in the source mean nothing, the tags say where lines end
+        text = " ".join(text.split())
+        text = _LINE_TAG.sub("\n", _LIST_ITEM.sub("\n- ", text))
+        text = re.sub(r"<[^>]*(>|$)", " ", text)
+    return not _requires_dutch(f"{html.unescape(title)}\n{text}")
+
 # Return the jobs that pass all of the filtering steps
 def passes_all(title: str, location: str = "", description: str = "") -> bool:
     return (
@@ -105,4 +174,5 @@ def passes_all(title: str, location: str = "", description: str = "") -> bool:
         and passes_exclude(title, description)
         and passes_location(location)
         and passes_language(title, description)
+        and passes_dutch_requirement(title, description)
     )

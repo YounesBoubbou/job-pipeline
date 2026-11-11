@@ -173,7 +173,7 @@ The phone works only on the home Wi-Fi, while the PC is on and `start.ps1` is ru
   |---|---|---|
   | Role type | none picked | Show only AI Engineer / Software Engineer / Data Scientist / Data Engineer / ML Engineer |
   | Entry-level only | on | Hides titles with senior, sr, lead, principal, staff, head of, manager or director, and jobs asking 3 or more years (e.g. 3+, 3-5, "at least three") |
-  | No Dutch required | on | Hides jobs mentioning dutch, nederlands, fluent in Dutch or native Dutch |
+  | No Dutch required | on | Hides jobs with a sentence requiring Dutch ("fluent in Dutch", "Dutch is a must", "Dutch (C1)", "Nederlands vereist"), unless it calls Dutch a plus |
   | IND sponsors | **on** | Shows only jobs labelled `Yes` |
   | MSc-friendly | off | Shows only jobs mentioning master, MSc or M.Sc |
 
@@ -299,9 +299,10 @@ When the same job comes from the target list and one of these, the target-list c
 
 ### Filters
 
-A job is kept only if it passes all four rules in `filters.py` (word lists in `config.py`):
+A job is kept only if it passes all five rules in `filters.py` (word lists in `config.py`):
 a tech word in the title; no seniority word in the title and no 3+ years asked; a Dutch
-place in the location, or plain "Remote"; and not written mostly in Dutch.
+place in the location, or plain "Remote"; not written mostly in Dutch; and no sentence that
+requires Dutch ("fluent in Dutch", "Dutch is a must") without calling it a plus or nice to have.
 
 ### Sponsor label
 
