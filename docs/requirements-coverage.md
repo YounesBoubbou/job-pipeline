@@ -1,6 +1,6 @@
 # Requirements: more companies covered
 
-Status: **draft, waiting for Younes's sign-off** (written 2026-11-11)
+Status: **signed off by Younes** (2026-11-11)
 
 This is the single source of truth for the coverage work that follows the MVP. Anyone
 building it, human or agent, follows it to the letter. If something is not written here, it
@@ -256,9 +256,9 @@ phase to describe the pipeline as it then works.
 - When a requirement cannot be met as written, stop and report; do not quietly do something
   close to it.
 
-## 7. To confirm at sign-off
+## 7. Confirmed details
 
-Proposed by Claude; each needs a yes or a correction from Younes:
+Proposed by Claude and confirmed by Younes on 2026-11-11 ("yes to all"):
 
 1. **A2:** websites are found by a guess-and-verify script first, then by an agent with web
    search for the rest. The agent step costs Claude usage once, nothing per day.
