@@ -10,10 +10,10 @@ cannot be finished without him.
 
 ## Phase A: the scan
 
-- [ ] **A-1. ADR for the scan** (Q4). `docs/adr/0013-careers-page-scan.md`: the new
+- [x] **A-1. ADR for the scan** (Q4). `docs/adr/0013-careers-page-scan.md`: the new
   `targets.csv` columns (`website`, `careers_url`, `ats_seen`, `ats_evidence`, `scan_note`),
   the `ats_seen` values of A4, the politeness rules of A6, and how the scan resumes (A9).
-- [ ] **A-2. Scan script** (A2 step 1, A3, A4, A5, A6, A9). **plan** New `coverage_scan.py`
+- [x] **A-2. Scan script** (A2 step 1, A3, A4, A5, A6, A9). **plan** New `coverage_scan.py`
   at the repo root (same style as `ats_resolver.py`). Guess-and-verify websites, find the
   careers page, detect the system from links, frames, scripts and redirects, note
   `JobPosting` data, obey robots.txt and the request limits, save after every company and
