@@ -19,7 +19,7 @@ cannot be finished without him.
   `JobPosting` data, obey robots.txt and the request limits, save after every company and
   resume. Detection patterns for each system in A4 are confirmed on a real page before use.
   Tests with fake sites only.
-- [ ] **A-3. Run the scan** (A1). All 1,045 rows, in the background, worktree `data/` only.
+- [x] **A-3. Run the scan** (A1). All 1,045 rows, in the background, worktree `data/` only.
   Read the log's failure list before trusting the result.
 - [ ] **A-4. Websites by web search** (A2 step 2). Agent batches for rows with no website:
   address plus one line of evidence each. Then rerun the scan on just those rows.
