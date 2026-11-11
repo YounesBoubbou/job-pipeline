@@ -110,6 +110,25 @@ def test_summary_written_when_run_crashes(run_env, monkeypatch):
     assert s["jobs_added"] == 0
 
 
+def test_job_without_url_does_not_crash_run(run_env, monkeypatch):
+    # A Jibe job once came through with url=None and crashed the digest print (B-3).
+    no_url = {**JOB, "url": None, "title": "Project Engineer", "company": "Mammoet"}
+    monkeypatch.setattr(main, "fetch_target_jobs", lambda: ([dict(JOB), no_url], [], []))
+
+    main.run()
+
+    assert _summary(run_env)["status"] == "completed"
+    assert "Project Engineer" in (run_env / "jobs.csv").read_text(encoding="utf-8")
+
+
+def test_deduplicate_does_not_record_missing_url():
+    seen = set()
+    a = {**JOB, "url": None, "title": "A"}
+    b = {**JOB, "url": None, "title": "B"}
+    assert output.deduplicate([a, b], seen) == [a, b]
+    assert None not in seen
+
+
 def test_step_labels_name_the_real_sources(run_env, capsys):
     main.run()
 

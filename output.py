@@ -48,10 +48,11 @@ def deduplicate(jobs: list[dict], seen: set) -> list[dict]:
     board, the target-list copy is kept whatever order the sources were fetched in (P4)."""
     new_jobs = []
     for j in sorted(jobs, key=lambda j: not _is_target(j)):  # stable: keeps order otherwise
-        key = _posting_key(j)
-        if j["url"] in seen or key in seen:
+        key, url = _posting_key(j), j.get("url")
+        if (url and url in seen) or key in seen:
             continue
-        seen.add(j["url"])
+        if url:  # no address is not recorded: it would mark every later job without one as seen
+            seen.add(url)
         seen.add(key)
         new_jobs.append(j)
     return new_jobs
