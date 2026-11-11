@@ -337,7 +337,7 @@ def _heineken(token):
     # Token is https://careers.theheinekencompany.com. No API: the job list is server-rendered
     # HTML, 10 jobs a page. robots.txt asks for 5 seconds between requests. The order shifts
     # a little between pages, so a job can show up twice. Descriptions are only on each job's
-    # own page and are not fetched (ADR-0010).
+    # own page; _heineken_description reads them (ADR-0012).
     base, seen = token.rstrip("/"), set()
     for n in range(30):
         if n:
@@ -360,8 +360,9 @@ def _heineken(token):
             break
 
 
-# Workday and SmartRecruiters listings carry no description, so it takes one request per job.
-# On failure these return "", which leaves only the title for the filters to judge.
+# Workday, SmartRecruiters, Eightfold, Phenom and Heineken listings carry no description, so
+# it takes one request per job. Heineken waits 5 seconds before each one (its robots.txt).
+# On failure these return "", which leaves only the title and location for the filters to judge.
 
 def _workday_description(token, url):
     base = token.rstrip("/")
@@ -409,11 +410,24 @@ def _phenom_description(token, url):
         return ""
 
 
+def _heineken_description(token, url):
+    # token is unused; it is here so all description fetchers take the same arguments.
+    try:
+        time.sleep(5)
+        r = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+        r.raise_for_status()
+        fields = BeautifulSoup(r.text, "html.parser").select_one(".job-fields")
+        return fields.get_text(" ", strip=True) if fields else ""
+    except Exception:
+        return ""
+
+
 DESCRIPTION_FETCHERS = {
     "workday":         _workday_description,
     "smartrecruiters": _smartrecruiters_description,
     "eightfold":       _eightfold_description,
     "phenom":          _phenom_description,
+    "heineken":        _heineken_description,
 }
 
 FETCHERS = {

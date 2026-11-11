@@ -34,7 +34,7 @@ immigration service's list of employers allowed to hire on a skilled-migrant vis
 
 **Known limits.** Rabobank's careers site blocks automated access, so it is not fetched. New
 filter rules apply only to jobs found from then on; jobs already in `data/jobs.csv` are not
-re-checked. Heineken jobs have no description, so only their title and location are filtered.
+re-checked.
 Open decisions and to-dos are listed in `docs/tasks.md` under "Waiting for Younes".
 
 ---
@@ -274,7 +274,7 @@ site runs on. Each kind has its own fetcher in `scrapers/targets.py`:
 | `getnoticed` | `https://www.werkenbijabnamro.nl` | ABN AMRO; Netherlands jobs only (ADR-0009) |
 | `eightfold` | `https://portal.careers.hsbc.com/careers?domain=hsbc.com` | HSBC, DSM-Firmenich (ADR-0010) |
 | `phenom` | `https://careers.akzonobel.com/gb/en` | AkzoNobel (ADR-0010) |
-| `heineken` | `https://careers.theheinekencompany.com` | Heineken's own site, read as HTML; no descriptions (ADR-0010) |
+| `heineken` | `https://careers.theheinekencompany.com` | Heineken's own site, read as HTML; descriptions from each job page, 5 s apart (ADR-0012) |
 
 For the boards that ask for Netherlands jobs only, `fetched` in the run summary counts Dutch
 listings, not every listing worldwide.

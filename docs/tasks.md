@@ -84,10 +84,12 @@ cannot be finished without him.
   but fetches RemoteOK and Arbeitnow; unused `IND_REGISTER_URL` and stale comments in
   `config.py`. No behaviour change.
 
-- [ ] **24. Heineken descriptions** (P2). **plan** Files: `scrapers/targets.py` (the
+- [x] **24. Heineken descriptions** (P2). **plan** Files: `scrapers/targets.py` (the
   `heineken` fetcher). Fetch each job's page for its description, obeying the site's
   5-second crawl delay, only for jobs that pass the title and location filters (as Workday
   does), so the Dutch and years rules apply to Heineken too. Report the extra run time.
+  *Done 2026-11-11 (ADR-0012): live check 46 page fetches, 285 s for Heineken (was ~30 s),
+  17 Dutch-language or Dutch-required jobs now dropped, 29 kept. Full run expected ~10.5 min.*
 - [x] **25. NXP board** (P5). Its Workday board answers 422. Find where NXP now publishes
   jobs, confirm it is NXP, and fix its `targets.csv` row. If no readable board exists, set
   it to `none` and say so below. *Done 2026-11-11: moved to `nxp.myworkdayjobs.com/careers`

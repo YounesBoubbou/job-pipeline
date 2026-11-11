@@ -2,7 +2,7 @@
 
 Date: 2026-11-10
 
-Status: accepted by Younes, 2026-11-11.
+Status: accepted by Younes, 2026-11-11. Superseded in part by ADR-0012 (Heineken descriptions).
 
 ## Context
 

@@ -235,7 +235,50 @@ def test_heineken_stops_on_empty_page(monkeypatch, sleeps):
     assert len(calls) == 1
 
 
+def test_heineken_description(monkeypatch, sleeps):
+    page = '<html><div class="job-fields"><p>Full text</p></div></html>'
+    calls = _fake_get(monkeypatch, lambda url, params: Response(text=page))
+
+    assert targets._heineken_description(HK, f"{HK}/job/a") == "Full text"
+    assert calls == [(f"{HK}/job/a", {})]
+    assert sleeps == [5]
+
+
+def test_heineken_description_failure_returns_empty(monkeypatch, sleeps):
+    _fake_get(monkeypatch, lambda url, params: Response(status_code=500))
+    assert targets._heineken_description(HK, f"{HK}/job/a") == ""
+
+    _fake_get(monkeypatch, lambda url, params: Response(text="<html><p>No fields</p></html>"))
+    assert targets._heineken_description(HK, f"{HK}/job/a") == ""
+
+    def refuse(url, params):
+        raise targets.requests.ConnectionError("down")
+    _fake_get(monkeypatch, refuse)
+    assert targets._heineken_description(HK, f"{HK}/job/a") == ""
+
+
 # Through fetch_target_jobs
+
+def test_heineken_descriptions_only_for_jobs_passing_title_and_location(monkeypatch, sleeps):
+    monkeypatch.setattr(targets, "load_targets", lambda: [
+        {"company": "Beer", "source": "heineken", "token": HK, "board_status": "hand"}])
+    listing = _hk_page([_hk_item("brewer", "Brewer", "Amsterdam, Netherlands"),
+                        _hk_item("analyst", "Data Analyst", "Amsterdam, Netherlands"),
+                        _hk_item("data-eng", "Data Engineer", "Amsterdam, Netherlands"),
+                        _hk_item("swe", "Software Engineer", "Amsterdam, Netherlands")], more=False)
+    pages = {f"{HK}/job/analyst": Response(text='<div class="job-fields">Fluent Dutch is required</div>'),
+             f"{HK}/job/data-eng": Response(text='<div class="job-fields">3+ years of experience</div>'),
+             f"{HK}/job/swe": Response(status_code=500)}
+    calls = _fake_get(monkeypatch, lambda url, params: pages.get(url) or Response(text=listing))
+
+    jobs, boards, failed = targets.fetch_target_jobs()
+
+    assert failed == []
+    assert boards[0]["fetched"] == 4 and boards[0]["kept"] == 1
+    assert [(j["title"], j["description_snippet"]) for j in jobs] == [("Software Engineer", "")]
+    assert f"{HK}/job/brewer" not in [url for url, _ in calls]
+    assert sleeps == [5, 5, 5]
+
 
 def test_new_kinds_are_fetched_from_targets(monkeypatch, sleeps):
     rows = [{"company": "Eight", "source": "eightfold", "token": EF_TOKEN, "board_status": "hand"},
