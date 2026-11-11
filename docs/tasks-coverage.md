@@ -54,3 +54,8 @@ One task: `docs/coverage-final-report.md` (D1).
   domain (Booking.com, Aanmelder.nl, Smartly.io) are now rejected. Both fixes are known and
   small. Your call: (a) allow a third round (recommended): fix both, review, then start the
   scan; (b) stop here.
+  **Update:** Younes allowed round 3 (2026-11-11). Both round-2 defects were fixed and verified
+  (216 tests pass). Review still failed on one gap: the common parking title "example.com -
+  This website is for sale!" is not caught, because the rule only knows "this domain ... for
+  sale". The fix is one regex alternative (website/site/domain) plus two test titles. Your
+  call: (a) allow that one-line fix with a final review (recommended); (b) stop here.
