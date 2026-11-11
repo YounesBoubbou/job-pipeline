@@ -64,10 +64,11 @@ cannot be finished without him.
 
 ## Follow-ups after first use (Younes, 2026-11-10)
 
-- [ ] **20. Exclude 3+ years, not 5+** (P2, changed by Younes). First version committed as
+- [x] **20. Exclude 3+ years, not 5+** (P2, changed by Younes). First version committed as
   `3e7446f` before review; review failed twice. **Round 3 allowed by Younes (2026-11-11):**
   on branch `task20-years-round2`, fix "a 3-5 year contract", "between 1 and 3 years" and
   "max / no more than 3 years" (none of these may hide a job), review, merge into `mvp`.
+  *Done 2026-11-11: passed review on the second try of round 3, merged.*
 - [x] **21. Tracker keeps changes made while the Sheet is down.** Files:
   `frontend/src/context/TrackerContext.jsx`. Today a job marked applied (or a status changed)
   while the Sheet is unreachable lives only in the browser and is overwritten by the Sheet's

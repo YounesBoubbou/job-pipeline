@@ -179,3 +179,17 @@ None of these block the MVP; most are already listed under "Waiting for Younes".
 - **After the MVP (section 4):** morning email summary, CV/cover-letter generation, phone
   use away from home, the `review` rows in `targets.csv` (section 4 says 19; the file has 21
   today).
+
+## Update 2026-11-11
+
+- **P9:** Rabobank dropped by Younes (its sites block automated access), so P9 covers ten
+  employers. The 2026-11-11 run (366 s) fetched at least one job from each of the ten. **Pass.**
+- **P2:** the years rule now excludes 3+ years without hiding junior wordings (task 20); jobs
+  requiring Dutch are dropped (task 22, merged as is); Heineken jobs now have descriptions,
+  so both rules apply to them too (task 24, ADR-0012). The "Heineken has no descriptions"
+  note above no longer holds.
+- **P5:** NXP's board fixed; Payconiq, 50five and Leiden University set to `none` (tasks 25-26).
+- **P6:** Heineken descriptions add about 4 minutes; the next full run is expected at about
+  10.5 minutes, under the 15-minute limit. To confirm from that run's summary.
+- **P8:** the scheduled task is registered (daily 08:00). To confirm on 2026-11-12.
+- **W7:** phone check done by Younes. **Pass.**
