@@ -172,7 +172,7 @@ The phone works only on the home Wi-Fi, while the PC is on and `start.ps1` is ru
   | Filter | Default | What it does |
   |---|---|---|
   | Role type | none picked | Show only AI Engineer / Software Engineer / Data Scientist / Data Engineer / ML Engineer |
-  | Entry-level only | on | Hides titles with senior, sr, lead, principal, staff, head of, manager or director, and jobs asking 3 or more years (e.g. 3+, 3-5, "at least three") |
+  | Entry-level only | on | Hides titles with senior, sr, lead, principal, staff, head of, manager or director, and jobs asking 3 or more years (e.g. "3+ years", "3-5 years", "at least three years"; a range counts by its lower end, so "2-3 years" stays; contract lengths and limits like "max 3 years" don't count) |
   | No Dutch required | on | Hides jobs with a sentence requiring Dutch ("fluent in Dutch", "Dutch is a must", "Dutch (C1)", "Nederlands vereist"), unless it calls Dutch a plus |
   | IND sponsors | **on** | Shows only jobs labelled `Yes` |
   | MSc-friendly | off | Shows only jobs mentioning master, MSc or M.Sc |
