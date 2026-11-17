@@ -106,8 +106,9 @@ def _workday(token):
         if "title" not in j or "externalPath" not in j:  # some boards pad pages with stubs
             continue
         location = j.get("locationsText", "")
-        # Multi-location jobs only say "3 Locations"; the detail endpoint lists them.
-        if re.fullmatch(r"\d+ Locations", location):
+        # Multi-location jobs only say "3 Locations", and some boards (Accenture) leave the
+        # location out of the listing entirely; the detail endpoint lists them.
+        if not location or re.fullmatch(r"\d+ Locations", location):
             location = _workday_locations(f"{host}/wday/cxs/{tenant}/{site}{j['externalPath']}") or location
         yield j["title"], location, base + j["externalPath"], ""
 

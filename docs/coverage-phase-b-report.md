@@ -24,7 +24,10 @@ blank source and token. Every changed row says why in `scan_note` (`fill:` and `
 
 ## For Younes
 
-1. **Spot-check** the 15 new `hand` rows listed in the chat (B3). Open.
+1. **Spot-check** of 15 new `hand` rows (B3): done 2026-11-17 by Claude, Younes to approve.
+   12 confirmed as the right company's board. Fixed: Accenture's Workday listings have no
+   location text, so all 140 NL jobs were dropped (now read from the detail page); Novartis
+   moved to its main board `Novartis_Careers`; fonQ's board is unreachable, set to `none`.
 2. **Merge** `coverage` into `mvp` when happy; the 08:00 run picks the new boards up from then.
 3. Known gaps, not fixed here:
    - Dutch towns the location filter doesn't know: Capelle aan den IJssel (AIG),

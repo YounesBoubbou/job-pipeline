@@ -116,3 +116,24 @@ def test_multi_location_job_still_resolved(monkeypatch):
     jobs = list(targets._workday(TOKEN))
     assert jobs == [("Data Engineer 1", "Amsterdam; Berlin", TOKEN + "/job/1", "")]
     assert details == ["https://acme.wd3.myworkdayjobs.com/wday/cxs/acme/External/job/1"]
+
+
+def test_job_without_location_text_is_resolved(monkeypatch):
+    # Accenture's listings have no locationsText at all; without the detail lookup the
+    # empty location fails the filter and every job is dropped.
+    facets = [{"facetParameter": "locationCountry", "values": [{"descriptor": "Netherlands", "id": "nl-id"}]}]
+    job = {"title": "Data Engineer 1", "externalPath": "/job/1"}
+    _fake_post(monkeypatch, [
+        {"total": 1, "jobPostings": [job], "facets": facets},
+        {"total": 1, "jobPostings": [job], "facets": facets},
+    ])
+
+    class Detail:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"jobPostingInfo": {"location": "Amsterdam", "additionalLocations": []}}
+
+    monkeypatch.setattr(targets.requests, "get", lambda url, **kwargs: Detail())
+    assert list(targets._workday(TOKEN)) == [("Data Engineer 1", "Amsterdam", TOKEN + "/job/1", "")]
