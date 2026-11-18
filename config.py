@@ -15,8 +15,8 @@ KEYWORDS_INCLUDE = [
     "llm", "llms", "algorithms", "quant", "quantitative", "devops", "sre",
     "backend", "back end", "frontend", "front end", "fullstack", "full stack",
     "python", "java", "php",
-    # Entry-level routes that often have no tech word in the title
-    "graduate", "internship",
+    # Graduate programmes often have no tech word in the title
+    "graduate",
 ]
 
 # Checked against the title only: descriptions say things like "report to your manager"
@@ -26,6 +26,9 @@ KEYWORDS_EXCLUDE = [
     # Titles with an include word that still aren't software or data jobs
     "sales", "presales", "account", "business developer", "writer",
     "mechanical", "electrical", "electronic", "geotechnical", "material", "wind", "aircraft",
+    # Internships: low pay, no visa sponsorship, aimed at students (English and Dutch)
+    "intern", "interns", "internship", "internships", "thesis", "graduation", "working student",
+    "stage", "stages", "stagiair", "stagiaire", "afstudeerstage", "afstudeeropdracht", "werkstudent",
 ]
 
 # Checked against the title and description, on top of the "3 or more years" pattern in filters.py

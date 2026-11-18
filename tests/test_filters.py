@@ -48,9 +48,21 @@ def test_include_needs_a_tech_word_in_the_title():
     assert passes_include("Medior back-end developer")
 
 
-def test_include_accepts_graduate_and_internship_titles():
+def test_include_accepts_graduate_titles():
     assert passes_include("Elsevier Netherlands Graduate Program 2027")
-    assert passes_include("Thesis Internship - 2027")
+
+
+def test_exclude_rejects_internships():
+    assert not passes_exclude("Software Engineering Intern (2027 Start) - Amsterdam")
+    assert not passes_exclude("AI Software Development Internship")
+    assert not passes_exclude("Thesis Internship - 2027")
+    assert not passes_exclude("Stage Data Analist Sourcing Intelligence")
+    assert not passes_exclude("Werkstudent Data Engineering")
+    assert not passes_exclude("Graduation Internship Noise Mitigation Systems")
+    # Whole words only: these are real jobs
+    assert passes_exclude("Internal Tools Developer")
+    assert passes_exclude("Data Engineer, International Payments")
+    assert passes_exclude("Graduate Software Engineer")
 
 
 def test_include_rejects_seniority_alone_and_partial_words():
