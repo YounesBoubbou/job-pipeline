@@ -135,9 +135,12 @@ address per system is checked by hand before phase C relies on it.
   is stricter, so it is kept, and sites like HSBC (`Disallow: /` before `Allow: /careers`)
   come out `blocked`. A crawl delay above 30 seconds is not waited out; the site is noted
   `blocked` ("robots.txt crawl-delay …").
-- **At most 6 requests per site per company**, robots.txt and each redirect hop included. A
-  site is a registrable domain (`jobs.funda.nl` and `funda.nl` are one site;
-  `werkenbijachmea.nl` is another, with its own 6). When the limit is reached, the row is
+- **At most 12 requests per site per company** (6 until 2026-11-18: big sites spent them on
+  robots.txt and redirects before reaching the careers page), robots.txt and each redirect hop
+  included. A site is a registrable domain (`jobs.funda.nl` and `funda.nl` are one site;
+  `werkenbijachmea.nl` is another, with its own 12).
+- **One job page.** When the careers page lists jobs on the company's own site but shows no
+  job system, the first job's page is opened: its Apply link often names the system. When the limit is reached, the row is
   decided from what is known, noted "request limit reached".
 - **At least 1 second between requests to the same site**, or the crawl delay if longer,
   kept for the whole run (sites shared by several companies, such as relx.com).

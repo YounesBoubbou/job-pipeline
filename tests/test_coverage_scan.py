@@ -249,6 +249,32 @@ def test_custom_from_job_links(monkeypatch):
     assert out["ats_seen"] == "custom" and "jobposting=no" in out["scan_note"]
 
 
+def test_job_page_reveals_the_job_system(monkeypatch):
+    # Databricks, GitLab: jobs listed on the company's own site; the Apply link on a job's
+    # page is the evidence. Only the first job page is opened, the job system never.
+    site = Site(monkeypatch, {
+        "https://own.com/": ok(html("Own", '<a href="/careers">Careers</a>')),
+        "https://own.com/careers": ok(html("Careers at Own",
+            '<a href="/careers/data-engineer-123">a</a><a href="/careers/ml-engineer-456">b</a>')),
+        "https://own.com/careers/data-engineer-123": ok(html("Data Engineer",
+            '<a href="https://job-boards.greenhouse.io/own/jobs/123">Apply</a>')),
+    })
+    out = cs.scan_row(row("Own", website="https://own.com"))
+    assert out["ats_seen"] == "greenhouse" and out["careers_url"] == "https://own.com/careers"
+    assert "https://own.com/careers/ml-engineer-456" not in site.urls()
+
+
+def test_job_page_redirect_to_job_system_is_evidence(monkeypatch):
+    Site(monkeypatch, {
+        "https://own.com/": ok(html("Own", '<a href="/careers">Careers</a>')),
+        "https://own.com/careers": ok(html("Careers at Own",
+            '<a href="/careers/data-engineer-123">a</a><a href="/careers/ml-engineer-456">b</a>')),
+        "https://own.com/careers/data-engineer-123": redirect("https://own.recruitee.com/o/data-engineer"),
+    })
+    out = cs.scan_row(row("Own", website="https://own.com"))
+    assert out["ats_seen"] == "recruitee"
+
+
 def test_custom_from_jobposting_only(monkeypatch):
     _careers_site(monkeypatch, '<script type="application/ld+json">{"@graph": [{"@type": ["JobPosting"]}]}</script>'
                                '<script type="application/ld+json">{broken</script>')
@@ -304,12 +330,14 @@ def test_robots_fetched_with_our_user_agent(monkeypatch):
     assert out["ats_seen"] == "recruitee"
 
 
-# 9. Politeness (A6 check): 6 requests per site, 1 s apart (or the crawl delay), our headers.
-def test_never_more_than_six_requests_per_site(monkeypatch):
-    links = "".join(f'<a href="/careers{i}">Careers</a>' for i in range(10))
-    site = Site(monkeypatch, {"https://busy.com/": ok(html("Busy", links))})
+# 9. Politeness (A6 check): 12 requests per site, 1 s apart (or the crawl delay), our headers.
+def test_never_more_than_twelve_requests_per_site(monkeypatch):
+    assert cs.MAX_REQUESTS_PER_SITE == 12
+    hops = {f"https://busy.com/r{i}": redirect(f"https://busy.com/r{i + 1}") for i in range(30)}
+    links = "".join(f'<a href="/r{i * 5}">Careers</a>' for i in range(5))
+    site = Site(monkeypatch, {"https://busy.com/": ok(html("Busy", links)), **hops})
     out = cs.scan_row(row("Busy", website="https://busy.com"))
-    assert len(site.calls) == 6
+    assert len(site.calls) == 12
     assert "request limit reached" in out["scan_note"]
 
 
@@ -582,3 +610,11 @@ def test_parked_wording(title, parked):
 def test_address_in_company_name_is_not_stripped(company, host, title):
     names = cs.company_names(row(company))
     assert cs.names_company(names, cs._soup(html(title)), (host, "www." + host))
+
+
+def test_job_system_makers_own_site_is_not_loaded(monkeypatch):
+    # Recruitee's website is recruitee.com, a job-system host: never requested, no crash.
+    site = Site(monkeypatch, {})
+    out = cs.scan_row(row("Recruitee", website="https://recruitee.com"))
+    assert out["ats_seen"] == "no_careers_page" and "job system's own site" in out["scan_note"]
+    assert site.urls() == []

@@ -35,7 +35,7 @@ from ind_checker import normalise_name
 from scrapers.targets import FETCHERS, HEADERS, TARGETS_PATH, load_targets
 
 NEW_COLUMNS = ["website", "careers_url", "ats_seen", "ats_evidence", "scan_note"]
-MAX_REQUESTS_PER_SITE = 6   # per company, robots.txt and redirect hops included (A6)
+MAX_REQUESTS_PER_SITE = 12  # per company, robots.txt and redirect hops included (A6; was 6, raised 2026-11-18)
 MIN_GAP = 1.0               # seconds between requests to the same site (A6)
 MAX_CRAWL_DELAY = 30        # a longer robots.txt Crawl-delay is not waited out: blocked
 TIMEOUT = 15
@@ -461,10 +461,11 @@ def _is_job_link(url: str) -> bool:
     return bool(m) and ("-" in m.group(1) or bool(re.search(r"\d{3,}", m.group(1))))
 
 
-def job_links(page_url, soup) -> set:
-    """Same-site links to a single job's page (a slug or an ID after careers/jobs/vacatures)."""
+def job_links(page_url, soup) -> list:
+    """Same-site links to a single job's page (a slug or an ID after careers/jobs/vacatures),
+    in page order."""
     site = site_key(_host(page_url))
-    return {u for u, _ in _links(page_url, soup) if site_key(_host(u)) == site and _is_job_link(u)}
+    return list(dict.fromkeys(u for u, _ in _links(page_url, soup) if site_key(_host(u)) == site and _is_job_link(u)))
 
 
 def see_all_link(page_url, soup) -> str:
@@ -670,6 +671,7 @@ class Found:
         self.careers_url = ""
         self.hits = {}
         self.jobs = 0
+        self.job_urls = []  # job pages listed on the careers page, in page order
         self.jsonld = False
         self.no_openings = False
         self.careers_found = False
@@ -692,9 +694,11 @@ def _examine(page: Page, website: str, found: Found) -> bool:
     soup = _soup(page.html)
     hits = detect(page.url, page.html, page.redirects, soup)
     jsonld = has_jobposting(soup)
-    jobs = len(job_links(page.url, soup))
+    links = job_links(page.url, soup)
+    jobs = len(links)
     found.jsonld = found.jsonld or jsonld
     found.jobs = max(found.jobs, jobs)
+    found.job_urls += [u for u in links if u not in found.job_urls]
     found.no_openings = found.no_openings or bool(NO_OPENINGS.search(soup.get_text(" ")))
     found.unknown += [h for h in _unknown_hosts(page.url, soup, website) if h not in found.unknown]
     return _add_hits(found, hits) or jsonld or jobs >= 2
@@ -767,6 +771,14 @@ def _find_careers(website, home, scan, found):
     deeper = _open(nxt, scan, found) if nxt else None
     if deeper and _examine(deeper, website, found):
         found.careers_url = nxt if deeper.ats_url else deeper.url
+    if found.hits or not found.job_urls:
+        return
+    # Many companies list jobs on their own site, and only a job's own page links to the
+    # system behind it (an "Apply" link to Greenhouse, say). One job page is opened.
+    job = _open(found.job_urls[0], scan, found)
+    if job:
+        _add_hits(found, detect(job.ats_url, "", job.redirects) if job.ats_url
+                  else detect(job.url, job.html, job.redirects))
 
 
 # ---------------------------------------------------------------- one company
@@ -795,7 +807,11 @@ def scan_row(row) -> dict:
     except LimitReached:
         return _result(website, "", "blocked", "", ["request limit reached"], scan)
     if home.ats_url:  # the website itself redirects to a job system
-        kind, evidence, more = _choose(detect(home.ats_url, "", home.redirects))
+        hits = detect(home.ats_url, "", home.redirects)
+        if not hits:  # the company makes a job system (Recruitee, Personio): its site is never loaded
+            return _result(website, "", "no_careers_page", "",
+                           notes + ["website is a job system's own site, not loaded"], scan)
+        kind, evidence, more = _choose(hits)
         return _result(website, home.ats_url, kind, evidence, notes + more, scan)
     if home.wall or home.status != 200:
         return _result(website, "", "blocked", "", [f"homepage: {home.wall or f'HTTP {home.status}'}"] + notes, scan)
