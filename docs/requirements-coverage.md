@@ -112,7 +112,8 @@ of C4.
 
 **A6. Politeness.** The scan:
 - obeys each site's `robots.txt`, including any crawl delay;
-- makes at most 6 requests per company website, at least 1 second apart on the same site;
+- makes at most 12 requests per company website, at least 1 second apart on the same site
+  (raised from 6 on 2026-11-18 by Younes: big sites spent the 6 on redirects and robots.txt);
 - sends the same honest `User-Agent` as `scrapers/targets.py`, with no personal details;
 - uses plain web requests only. No headless browser (a browser run by a program), no
   logging in, no working around a block. A page that needs any of these is recorded as
