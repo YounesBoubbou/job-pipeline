@@ -106,8 +106,9 @@ def _workday(token):
         if "title" not in j or "externalPath" not in j:  # some boards pad pages with stubs
             continue
         location = j.get("locationsText", "")
-        # Multi-location jobs only say "3 Locations"; the detail endpoint lists them.
-        if re.fullmatch(r"\d+ Locations", location):
+        # Multi-location jobs only say "3 Locations", and some boards (Accenture) leave the
+        # location out of the listing entirely; the detail endpoint lists them.
+        if not location or re.fullmatch(r"\d+ Locations", location):
             location = _workday_locations(f"{host}/wday/cxs/{tenant}/{site}{j['externalPath']}") or location
         yield j["title"], location, base + j["externalPath"], ""
 
@@ -179,6 +180,18 @@ def _workday_locations(detail_url):
 # Booking.com and ABN AMRO run their own careers sites on iCIMS Jibe and GetNoticed
 # (ADR-0009). Both are asked for Netherlands jobs only, like Workday (ADR-0008).
 
+def _jibe_job_url(base, j):
+    # Mammoet's jobs (iCIMS behind Jibe) have no canonical_url. Its site opens a job at
+    # /jobs/<slug>?lang=<language>; without the language it shows an empty page.
+    url = (j.get("meta_data") or {}).get("canonical_url")
+    if url:
+        return url
+    slug = j.get("slug") or j.get("req_id")
+    if not slug:
+        return ""
+    return f"{base}/jobs/{slug}" + (f"?lang={j['language']}" if j.get("language") else "")
+
+
 def _jibe(token):
     # Token is the careers site, e.g. https://jobs.booking.com. Its robots.txt asks for
     # 5 seconds between requests.
@@ -190,7 +203,9 @@ def _jibe(token):
         data = r.json()
         for x in data["jobs"]:
             j = x["data"]
-            yield j["title"], j.get("full_location", ""), j["meta_data"]["canonical_url"], j.get("description", "")
+            url = _jibe_job_url(base, j)
+            if url:  # a job without an address can't be opened or deduplicated
+                yield j["title"], j.get("full_location", ""), url, j.get("description", "")
         if page * 100 >= data["totalCount"] or not data["jobs"]:
             break
         page += 1

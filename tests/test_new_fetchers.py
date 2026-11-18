@@ -46,6 +46,20 @@ def test_jibe_asks_for_netherlands_and_maps_fields(monkeypatch):
     assert calls[0][1] == {"page": 1, "limit": 100, "country": "Netherlands"}
 
 
+def test_jibe_builds_url_when_canonical_url_is_missing(monkeypatch):
+    # Mammoet's jobs have "canonical_url": null; its site opens /jobs/<slug>?lang=<language>.
+    mammoet = {"data": {"title": "Payroll Administrator", "full_location": "Schiedam, Netherlands",
+                        "slug": "8664", "req_id": "8664", "language": "nl-nl",
+                        "meta_data": {"canonical_url": None}, "description": ""}}
+    req_only = {"data": {"title": "Engineer", "req_id": "77", "meta_data": {}}}
+    no_id = {"data": {"title": "Ghost", "meta_data": {"canonical_url": None}}}
+    _fake_get(monkeypatch, lambda url, params: Response({"jobs": [mammoet, req_only, no_id], "totalCount": 3}))
+
+    jobs = list(targets._jibe(JIBE))
+
+    assert [j[2] for j in jobs] == [f"{JIBE}/jobs/8664?lang=nl-nl", f"{JIBE}/jobs/77"]  # Ghost skipped
+
+
 def test_jibe_pages_until_total_and_waits_between_pages(monkeypatch):
     pages = {1: [_jibe_job(n) for n in range(100)], 2: [_jibe_job(n) for n in range(100, 150)]}
     calls = _fake_get(monkeypatch, lambda url, params: Response({"jobs": pages[params["page"]], "totalCount": 150}))

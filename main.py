@@ -104,7 +104,7 @@ def _run(summary: dict):
     for job in sorted(new_jobs, key=lambda x: x["ind_sponsor"] == "Yes", reverse=True):
         sponsor_tag = f"[IND✓]" if job["ind_sponsor"] == "Yes" else ""
         print(f"  {sponsor_tag} {job['title']} @ {job['company']}")
-        print(f"     {job['url'][:80]}")
+        print(f"     {(job.get('url') or '')[:80]}")  # one job without an address must not crash the run
         print()
 
     print(f"  Full list saved to: data/jobs.csv")

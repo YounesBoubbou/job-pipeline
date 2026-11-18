@@ -8,6 +8,7 @@ so a name is never probed twice. Run by hand; each run handles the next batch:
     python ats_resolver.py          # next ATS_BATCH_SIZE names
     python ats_resolver.py 20       # next 20 names
     python ats_resolver.py targets  # fill source/token in targets.csv instead (ADR-0006)
+    python ats_resolver.py evidence [--company NAME]...  # from the careers-page scan (ADR-0014)
 """
 
 import csv
@@ -104,17 +105,20 @@ def save_map(ats_map: dict):
     os.replace(tmp, ATS_MAP_PATH)
 
 
-def _has_nl_job(vendor: str, token: str) -> bool:
+def status_from_postings(postings) -> str:
     """
-    A found board counts only if it lists at least one job in the Netherlands (ADR-0006).
-    A bare "Remote" doesn't count here: it says nothing about which company owns the board.
-    Recruitee demo accounts (accenture, ey) carry "(Sample)" jobs set in Amsterdam, so a
-    board with one is never accepted.
+    A found board counts ('auto') only if it lists at least one job in the Netherlands
+    (ADR-0006); otherwise it is 'review'. A bare "Remote" doesn't count here: it says
+    nothing about which company owns the board. Recruitee demo accounts (accenture, ey)
+    carry "(Sample)" jobs set in Amsterdam, so a board with one is never accepted.
     """
-    postings = list(FETCHERS[vendor](token))
     if any("(sample)" in title.lower() for title, _, _, _ in postings):
-        return False
-    return any(names_nl_place(loc) for _, loc, _, _ in postings)
+        return "review"
+    return "auto" if any(names_nl_place(loc) for _, loc, _, _ in postings) else "review"
+
+
+def _has_nl_job(vendor: str, token: str) -> bool:
+    return status_from_postings(list(FETCHERS[vendor](token))) == "auto"
 
 
 def resolve_targets(limit: int = None):
@@ -166,13 +170,129 @@ def resolve_targets(limit: int = None):
 def _save_targets(rows: list, fields: list):
     tmp = TARGETS_PATH + ".tmp"
     with open(tmp, "w", encoding="utf-8", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=fields)
+        w = csv.DictWriter(f, fieldnames=fields, lineterminator="\n")  # the file is kept LF
         w.writeheader()
         w.writerows(rows)
     os.replace(tmp, TARGETS_PATH)
 
 
+# ---------------------------------------------------------------- scan evidence (ADR-0014)
+
+FILL_SUMMARY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "fill_summary.json")
+
+
+def _same_board(token: str) -> str:
+    return token.strip().rstrip("/").lower()
+
+
+def _set_fill_note(row: dict, outcome: str):
+    """Append '; fill: <outcome>' to scan_note, replacing the one an earlier run wrote."""
+    parts = [p for p in row["scan_note"].split("; ") if p and not p.startswith("fill: ")]
+    row["scan_note"] = "; ".join(parts + [f"fill: {outcome}"])
+
+
+def _reason(e: Exception) -> str:
+    """A fetch error as one short scan_note part: no ';' or line breaks, ~150 characters."""
+    return re.sub(r"\s*[;\r\n]+\s*", " ", f"{type(e).__name__}: {e}").strip()[:150]
+
+
+def fill_from_evidence(path: str = TARGETS_PATH, companies=(), summary_path: str = FILL_SUMMARY_PATH) -> dict:
+    """
+    Fill source/token/board_status from the careers-page scan (ADR-0014): every row that
+    is not auto/hand and whose ats_seen is a kind we read. Old auto/hand rows are never
+    written. One fetch per board, no retries; status as in ADR-0006.
+    """
+    from coverage_scan import save_targets, token_from_evidence
+
+    rows = load_targets(path)
+    fields = list(rows[0].keys())
+    todo = [r for r in rows if r["board_status"] not in ("auto", "hand") and r["ats_seen"] in FETCHERS
+            and (not companies or r["company"] in companies)]
+    kept = {_same_board(r["token"]): r["company"] for r in rows
+            if r["board_status"] in ("auto", "hand") and r["token"]}
+    # Every token first, so two new rows on one board are both known before any fetch.
+    tokens = [token_from_evidence(r["ats_seen"], r["ats_evidence"]) for r in todo]
+    owners = {}
+    for r, token in zip(todo, tokens):
+        if token:
+            owners.setdefault(_same_board(token), []).append(r["company"])
+    print(f"  Filling {len(todo)} rows from the careers-page scan's evidence...")
+
+    summary = {"boards": [], "failed": [], "left_out": [], "new_auto": []}
+    for i, (row, token) in enumerate(zip(todo, tokens), 1):
+        kind, old = row["ats_seen"], (row["source"], row["token"])
+        was = f", was {old[0]}:{old[1]}" if row["board_status"] == "review" and old[1] else ""
+        key = _same_board(token)
+        others = [c for c in owners.get(key, []) if c != row["company"]]
+        if not token:  # a none row stays blank, a review row keeps what it had
+            if row["board_status"] != "review":
+                row["source"] = row["token"] = ""
+            outcome = "left out, no token in evidence"
+            summary["left_out"].append({"name": row["company"], "reason": "no token in evidence"})
+        elif key in kept:  # already fetched daily under another company
+            row["source"] = row["token"] = ""
+            outcome = f"left out, same board as {kept[key]} (auto)"
+            summary["left_out"].append({"name": row["company"], "reason": f"same board as {kept[key]}"})
+        elif others:  # B-2 decides which company owns the board
+            row["source"], row["token"], row["board_status"] = kind, token, "review"
+            outcome = f"review, same board as {', '.join(others)}{was}"
+        else:
+            try:
+                postings = list(FETCHERS[kind](token))
+            except Exception as e:  # one broken board must not stop the run; the row is left out
+                if row["board_status"] != "review":
+                    row["source"] = row["token"] = ""
+                reason = _reason(e)
+                outcome = f"left out, fetch failed {reason}"
+                summary["failed"].append({"name": row["company"], "source": f"{kind}:{token}", "reason": reason})
+            else:
+                row["source"], row["token"] = kind, token
+                row["board_status"] = status = status_from_postings(postings)
+                n = len(postings)
+                if status == "auto":
+                    outcome = f"auto, {n} listings{was}"
+                    summary["new_auto"].append({"name": row["company"], "source": f"{kind}:{token}", "fetched": n})
+                elif any("(sample)" in title.lower() for title, _, _, _ in postings):
+                    outcome = f'review, "(Sample)" job in {n} listings{was}'
+                elif n == 0:
+                    outcome = f"review, 0 listings{was}"
+                else:
+                    outcome = f"review, no NL place in {n} listings{was}"
+                summary["boards"].append({"name": row["company"], "source": f"{kind}:{token}",
+                                          "fetched": n, "status": status})
+            time.sleep(REQUEST_DELAY)
+        _set_fill_note(row, outcome)
+        save_targets(rows, fields, path)  # after every row, so an interrupted run loses nothing
+        print(f"  [{i}/{len(todo)}] {row['company']}: {outcome}")
+
+    print(f"\n  Boards fetched: {len(summary['boards'])}, failed: {len(summary['failed'])}, "
+          f"left out: {len(summary['left_out'])}")
+    print("\n  Left out:")
+    for e in summary["left_out"]:
+        print(f"    {e['name']}: {e['reason']}")
+    print("\n  Failed:")
+    for e in summary["failed"]:
+        print(f"    {e['name']} ({e['source']}): {e['reason']}")
+    print("\n  New auto rows (checked by hand in B-2):")
+    for e in summary["new_auto"]:
+        print(f"    {e['name']}: {e['source']} ({e['fetched']} listings)")
+
+    os.makedirs(os.path.dirname(summary_path), exist_ok=True)
+    with open(summary_path, "w", encoding="utf-8") as f:
+        json.dump(summary, f, indent=1, ensure_ascii=False)
+    return summary
+
+
 def main():
+    if len(sys.argv) > 1 and sys.argv[1] == "evidence":
+        args, companies = sys.argv[2:], []
+        while args:
+            if args[0] != "--company" or len(args) < 2:
+                sys.exit("usage: python ats_resolver.py evidence [--company NAME]...")
+            companies.append(args[1])
+            args = args[2:]
+        sys.stdout.reconfigure(errors="replace")  # a company name the console can't show must not stop the run
+        return fill_from_evidence(companies=companies)
     if len(sys.argv) > 1 and sys.argv[1] == "targets":
         return resolve_targets(int(sys.argv[2]) if len(sys.argv) > 2 else None)
     batch_size = int(sys.argv[1]) if len(sys.argv) > 1 else ATS_BATCH_SIZE
