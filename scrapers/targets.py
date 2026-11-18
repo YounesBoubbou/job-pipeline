@@ -102,6 +102,9 @@ def _workday(token):
         return  # the board has location filters, and none of them is in the Netherlands
     else:
         pages = _workday_pages(api, nl_facets, _workday_page(api, 0, nl_facets))
+    # Asked through the board's country filter, every job is in the Netherlands, even when
+    # its location is a town we don't list (Veenendaal) or an office code ("ZOM HO 21").
+    by_country = bool(nl_facets) and "locations" not in nl_facets
     for j in pages:
         if "title" not in j or "externalPath" not in j:  # some boards pad pages with stubs
             continue
@@ -110,6 +113,8 @@ def _workday(token):
         # location out of the listing entirely; the detail endpoint lists them.
         if not location or re.fullmatch(r"\d+ Locations", location):
             location = _workday_locations(f"{host}/wday/cxs/{tenant}/{site}{j['externalPath']}") or location
+        if by_country and not names_nl_place(location):
+            location = f"{location}; Netherlands" if location else "Netherlands"
         yield j["title"], location, base + j["externalPath"], ""
 
 

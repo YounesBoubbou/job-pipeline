@@ -425,3 +425,10 @@ def test_dutch_requirement_reads_html_headings_and_lists():
 def test_passes_all_drops_dutch_required():
     assert not passes_all("Junior Data Engineer", "Amsterdam", "You are fluent in Dutch.")
     assert passes_all("Junior Data Engineer", "Amsterdam", "Dutch is a plus.")
+
+
+def test_location_knows_smaller_dutch_towns():
+    assert passes_location("Capelle aan den IJssel")
+    assert passes_location("Veenendaal")
+    assert passes_location("Baarle Nassau")
+    assert passes_location("Baarle-Nassau")

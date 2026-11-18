@@ -137,3 +137,19 @@ def test_job_without_location_text_is_resolved(monkeypatch):
 
     monkeypatch.setattr(targets.requests, "get", lambda url, **kwargs: Detail())
     assert list(targets._workday(TOKEN)) == [("Data Engineer 1", "Amsterdam", TOKEN + "/job/1", "")]
+
+
+def test_country_filtered_job_in_unlisted_place_is_tagged_netherlands(monkeypatch):
+    # Elekta says "Veenendaal", Siemens Healthineers an office code: the board's own
+    # country filter already vouches that they are in the Netherlands.
+    facets = [{"facetParameter": "locationCountry", "values": [{"descriptor": "Netherlands", "id": "nl-id"}]}]
+    page = {"total": 3, "jobPostings": [_job(1, "ZOM HO 21"), _job(2, "Amsterdam"), _job(3, "Veenendaal")],
+            "facets": facets}
+    _fake_post(monkeypatch, [page, page])
+    locations = [loc for _, loc, _, _ in targets._workday(TOKEN)]
+    assert locations == ["ZOM HO 21; Netherlands", "Amsterdam", "Veenendaal"]
+
+
+def test_unfiltered_board_is_not_tagged_netherlands(monkeypatch):
+    _fake_post(monkeypatch, [{"total": 1, "jobPostings": [_job(1, "Paris")], "facets": []}])
+    assert [loc for _, loc, _, _ in targets._workday(TOKEN)] == ["Paris"]

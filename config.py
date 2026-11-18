@@ -79,6 +79,7 @@ LOCATIONS = [
     "rotterdam", "den haag", "the hague", "gravenhage", "delft", "leiden", "utrecht", "amersfoort",
     "eindhoven", "veldhoven", "hertogenbosch", "den bosch", "tilburg", "breda", "nijmegen", "arnhem",
     "groningen", "enschede", "zwolle", "deventer", "maastricht", "wageningen",
+    "capelle aan den ijssel", "veenendaal", "baarle nassau", "baarle-nassau",
 ]
 
 # ── Company career pages to watch ─────────────
