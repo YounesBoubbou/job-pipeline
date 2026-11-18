@@ -26,7 +26,7 @@ cannot be finished without him.
 - [x] **A-5. Accuracy on known answers** (A7). Compare `ats_seen` with `source` on the 183
   `auto`/`hand` rows; at least 80% right where a website was found, at most 5 wrong
   board-reading kinds. Below that: fix the script, rerun, compare again.
-- [ ] **A-6. Accuracy by hand** (A8). The reviewer checks 40 random rows in a browser
+- [x] **A-6.** *Skipped by Younes's decision (2026-11-18).* Accuracy by hand** (A8). The reviewer checks 40 random rows in a browser
   (record the random pick); 36 or more must be right.
 - [x] **A-7. Scan report** (A10). `docs/coverage-scan-report.md`, plus README/CLAUDE.md (Q5).
   Then stop: phase B starts after Younes reads it.
@@ -63,3 +63,4 @@ One task: `docs/coverage-final-report.md` (D1).
   50 (Younes's choice) and stopped there: 1 gain in 50. A-5 ends at 62% against 80%, with 1
   wrong kind; the rest needs a browser (A6). A-6 (hand check of 40 rows) not done. Younes
   decides: accept 62% and skip A-6, and the phase C order in section 6 of the report.
+  **Decided 2026-11-18:** 62% accepted, A-6 skipped. Phase C order: later.

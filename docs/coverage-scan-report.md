@@ -114,8 +114,9 @@ at least 10 companies), except as a cheap add-on if one shares an API with a rea
 ## 7. Open
 
 - **A7 not met:** 62% against 80% (section 8). Younes chose to improve the scan; the
-  remaining misses need a browser, which A6 rules out. To decide: accept 62%.
-- **A8 (40 random rows checked by hand in a browser) not done.**
+  remaining misses need a browser, which A6 rules out. **Accepted by Younes (2026-11-18).**
+- **A8 (40 random rows checked by hand in a browser): skipped by Younes (2026-11-18).**
+- **Phase C order (section 6):** Younes decides later.
 - **A-4 stopped after the trial of 50** (1 gain in 50); 266 rows still have no website.
 - Group 1 rows without a board address (26) can be done by hand, a few minutes each.
 
