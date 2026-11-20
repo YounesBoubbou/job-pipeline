@@ -3,9 +3,10 @@ scrapers/targets.py — Fetch openings for every company in targets.csv (ADR-000
 
 Each row names a company, its ATS vendor (`source`) and its board token. Every vendor
 here has a public JSON API (GetNoticed's descriptions come from its RSS feed), except
-Heineken's own site, whose job list is read from HTML (ADR-0010). Boards that fail are
-reported at the end of the run rather than skipped silently, since a failure usually means
-the company moved to another ATS and the row needs updating.
+Heineken's own site, whose job list is read from HTML (ADR-0010), and Teamtailor, read from
+each careers site's public RSS feed (ADR-0015). Boards that fail are reported at the end of
+the run rather than skipped silently, since a failure usually means the company moved to
+another ATS and the row needs updating.
 """
 
 import csv
@@ -270,6 +271,28 @@ def _getnoticed_descriptions(base):
         return {}
 
 
+TEAMTAILOR_NS = {"tt": "https://teamtailor.com/locations"}
+
+
+def _teamtailor(token):
+    # Token is the careers site, e.g. https://jobs.sendcloud.com. Its RSS feed lists every job
+    # with its offices and full HTML description, so one request per board (ADR-0015).
+    r = requests.get(f"{token.rstrip('/')}/jobs.rss", headers=HEADERS, timeout=TIMEOUT)
+    r.raise_for_status()
+    for item in ET.fromstring(r.content).iterfind("channel/item"):
+        offices = []
+        for loc in item.iterfind("tt:locations/tt:location", TEAMTAILOR_NS):
+            parts = (loc.findtext("tt:city", "", TEAMTAILOR_NS).strip(),
+                     loc.findtext("tt:country", "", TEAMTAILOR_NS).strip())
+            if any(parts):
+                offices.append(", ".join(p for p in parts if p))
+        location = "; ".join(offices)
+        if not location and (item.findtext("remoteStatus") or "").strip().lower() == "fully":
+            location = "Remote"
+        yield (item.findtext("title", "").strip(), location, item.findtext("link", "").strip(),
+               item.findtext("description", ""))
+
+
 # HSBC and DSM-Firmenich (Eightfold), AkzoNobel (Phenom) and Heineken (its own site) are
 # asked for Netherlands jobs only too (ADR-0010).
 
@@ -463,6 +486,7 @@ FETCHERS = {
     "eightfold":       _eightfold,
     "phenom":          _phenom,
     "heineken":        _heineken,
+    "teamtailor":      _teamtailor,
 }
 
 

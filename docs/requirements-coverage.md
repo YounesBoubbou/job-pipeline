@@ -188,7 +188,7 @@ that fails this is not built; it goes to the phase D report.
 
 **C3. Each reader.** A new reader follows the pattern of the existing ones in
 `scrapers/targets.py`: one function in `FETCHERS` that yields
-`(title, location, description, url)`; a `DESCRIPTION_FETCHERS` entry when descriptions need
+`(title, location, url, description)`; a `DESCRIPTION_FETCHERS` entry when descriptions need
 a second request, used only for jobs that already pass the title and location rules; a
 failing board never stops the run and shows under `failed` in the run summary. Its rows get
 `source`, `token` and a status by B1 to B4.

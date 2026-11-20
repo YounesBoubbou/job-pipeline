@@ -51,7 +51,20 @@ rows on systems we already read, and scored 45/183 on known rows against the 80%
 
 ## Phase C: new readers
 
-Written after Younes confirms the order from the phase A report (C1).
+Order from the phase A report, section 6. Younes confirmed Teamtailor first (2026-11-20);
+the other systems are added here one at a time as he picks them.
+
+- [x] **C-1. Teamtailor ADR** (C2, Q4). `docs/adr/0015-teamtailor-reader.md`: the public
+  listing and that it needs no login; what `robots.txt` and the terms say; whether jobs can
+  be asked for by country; where the description is. If the check fails, the reader is not
+  built and Teamtailor goes to the phase D report.
+- [x] **C-2. Teamtailor reader** (C3). One function `_teamtailor` in `FETCHERS` of
+  `scrapers/targets.py` yielding `(title, location, url, description)` from the board's
+  `/jobs.rss`. Token = the board's base address (custom domains like `jobs.sendcloud.com`
+  included). Tests with fake responses: listing, description, empty board, failing board.
+- [ ] **C-3. Fill and fetch the 14 Teamtailor rows** (C3, B1 to B4). `source`/`token` from
+  `ats_evidence`/`careers_url`, one fetch each, status by ADR-0006; then a live fetch of
+  three real boards returning Dutch jobs, and a full run under 30 minutes (T1).
 
 ## Phase D: what is left
 
