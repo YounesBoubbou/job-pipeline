@@ -62,7 +62,7 @@ the other systems are added here one at a time as he picks them.
   `scrapers/targets.py` yielding `(title, location, url, description)` from the board's
   `/jobs.rss`. Token = the board's base address (custom domains like `jobs.sendcloud.com`
   included). Tests with fake responses: listing, description, empty board, failing board.
-- [ ] **C-3. Fill and fetch the 14 Teamtailor rows** (C3, B1 to B4). `source`/`token` from
+- [x] **C-3. Fill and fetch the 14 Teamtailor rows** (C3, B1 to B4). `source`/`token` from
   `ats_evidence`/`careers_url`, one fetch each, status by ADR-0006; then a live fetch of
   three real boards returning Dutch jobs, and a full run under 30 minutes (T1).
 
