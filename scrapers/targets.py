@@ -509,8 +509,9 @@ def fetch_target_jobs() -> tuple[list[dict], list[dict], list[dict]]:
 
     for t in load_targets():
         name, source, token = t["company"], t.get("source", "").lower(), t.get("token", "")
-        # 'review' rows have a board that may belong to another company (ADR-0006).
-        if source not in FETCHERS or not token or t.get("board_status") == "review":
+        # 'review' rows have a board that may belong to another company (ADR-0006);
+        # 'none' rows have no working board (switched off by hand when one goes dead).
+        if source not in FETCHERS or not token or t.get("board_status") in ("review", "none"):
             skipped.append(name)
             continue
 
