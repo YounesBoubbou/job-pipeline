@@ -76,6 +76,18 @@ the other systems are added here one at a time as he picks them.
   `ats_evidence`/`careers_url` (Oracle: `CX_45001` on `eeho.fa.us2.oraclecloud.com`;
   Akamai: find its site, else leave `none`), one fetch each, status by ADR-0006; then a live
   fetch of three real boards returning Dutch jobs, and a full run under 30 minutes (T1).
+- [x] **C-7. SAP SuccessFactors ADR** (C2, Q4). Younes chose SuccessFactors third and the
+  hybrid way of reading it (2026-11-27). `docs/adr/0017-successfactors-reader.md`.
+- [ ] **C-8. SAP SuccessFactors reader** (C3). `_successfactors` in `FETCHERS` of
+  `scrapers/targets.py`, as ADR-0017 says. Tests with fake responses: small site reads
+  every page; big site reads only slug matches (town, `NLD`, postcode); location from
+  address fields, from a labelled token, from the slug; `NLD` gets ", Netherlands";
+  description from `itemprop` and from a token; page without title skipped; failing page
+  skipped; failing sitemap fails the board.
+- [ ] **C-9. Fill and fetch the SuccessFactors rows** (C3, B1 to B4). As C-6, by ADR-0017's
+  "Filling rows"; every board's first page read live, boards whose pages give no title or
+  location set to `review` with the reason; live fetch of three boards with Dutch jobs, and
+  a full run under 30 minutes (T1).
 
 ## Phase D: what is left
 
