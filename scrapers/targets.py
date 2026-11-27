@@ -3,8 +3,9 @@ scrapers/targets.py — Fetch openings for every company in targets.csv (ADR-000
 
 Each row names a company, its ATS vendor (`source`) and its board token. Every vendor
 here has a public JSON API (GetNoticed's descriptions come from its RSS feed), except
-Heineken's own site, whose job list is read from HTML (ADR-0010), and Teamtailor, read from
-each careers site's public RSS feed (ADR-0015). Boards that fail are reported at the end of
+Heineken's own site, whose job list is read from HTML (ADR-0010), Teamtailor, read from
+each careers site's public RSS feed (ADR-0015), and Oracle Recruiting, read from the JSON
+endpoint its careers sites call (ADR-0016). Boards that fail are reported at the end of
 the run rather than skipped silently, since a failure usually means the company moved to
 another ATS and the row needs updating.
 """
@@ -293,6 +294,43 @@ def _teamtailor(token):
                item.findtext("description", ""))
 
 
+def _oracle_site(token):
+    # Token is the careers site, e.g. https://jpmc.fa.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001.
+    # Copied addresses may carry more path (/requisitions, /job/23501), a query or another
+    # language; only the host and site number are kept. Returns (host, site, clean address).
+    m = re.match(r"(https?://[^/]+)/hcmUI/CandidateExperience/[^/]+/sites/([^/?#]+)", token.strip())
+    if not m:
+        raise ValueError(f"not an Oracle Recruiting site address: {token}")
+    host, site = m.groups()
+    return host, site, f"{host}/hcmUI/CandidateExperience/en/sites/{site}"
+
+
+def _oracle(token):
+    # The listing is asked for Netherlands jobs only. That also returns jobs whose primary
+    # location is abroad but which list the Netherlands as a secondary one, so both are kept.
+    # Descriptions are not in the listing; _oracle_description reads them (ADR-0016).
+    host, site, base = _oracle_site(token)
+    offset = 0
+    while True:
+        r = requests.get(f"{host}/hcmRestApi/resources/latest/recruitingCEJobRequisitions"
+                         f"?onlyData=true&expand=requisitionList.secondaryLocations"
+                         f"&finder=findReqs;siteNumber={site},location=Netherlands,limit=100,offset={offset}",
+                         headers=HEADERS, timeout=TIMEOUT)
+        r.raise_for_status()
+        data = (r.json().get("items") or [{}])[0]
+        page = data.get("requisitionList") or []
+        for j in page:
+            names = [j.get("PrimaryLocation") or ""] + [x.get("Name") or "" for x in j.get("secondaryLocations") or []]
+            location = "; ".join(n.strip() for n in names if n.strip())
+            # Asked by country, every job is in the Netherlands (as with Workday, ADR-0008).
+            if not names_nl_place(location):
+                location = f"{location}; Netherlands" if location else "Netherlands"
+            yield j["Title"], location, f"{base}/job/{j['Id']}", ""
+        offset += 100
+        if not page or offset >= data.get("TotalJobsCount", 0):
+            break
+
+
 # HSBC and DSM-Firmenich (Eightfold), AkzoNobel (Phenom) and Heineken (its own site) are
 # asked for Netherlands jobs only too (ADR-0010).
 
@@ -403,7 +441,7 @@ def _heineken(token):
             break
 
 
-# Workday, SmartRecruiters, Eightfold, Phenom and Heineken listings carry no description, so
+# Workday, SmartRecruiters, Eightfold, Phenom, Oracle and Heineken listings carry no description, so
 # it takes one request per job. Heineken waits 5 seconds before each one (its robots.txt).
 # On failure these return "", which leaves only the title and location for the filters to judge.
 
@@ -453,6 +491,22 @@ def _phenom_description(token, url):
         return ""
 
 
+def _oracle_description(token, url):
+    try:
+        host, site, _ = _oracle_site(token)
+        job_id = url.rstrip("/").rsplit("/job/", 1)[1]
+        r = requests.get(f"{host}/hcmRestApi/resources/latest/recruitingCEJobRequisitionDetails"
+                         f'?expand=all&onlyData=true&finder=ById;Id="{job_id}",siteNumber={site}',
+                         headers=HEADERS, timeout=TIMEOUT)
+        r.raise_for_status()
+        j = r.json()["items"][0]
+        parts = (j.get("ExternalDescriptionStr"), j.get("ExternalResponsibilitiesStr"),
+                 j.get("ExternalQualificationsStr"))
+        return " ".join(p for p in parts if p)
+    except Exception:
+        return ""
+
+
 def _heineken_description(token, url):
     # token is unused; it is here so all description fetchers take the same arguments.
     try:
@@ -471,6 +525,7 @@ DESCRIPTION_FETCHERS = {
     "eightfold":       _eightfold_description,
     "phenom":          _phenom_description,
     "heineken":        _heineken_description,
+    "oracle":          _oracle_description,
 }
 
 FETCHERS = {
@@ -487,6 +542,7 @@ FETCHERS = {
     "phenom":          _phenom,
     "heineken":        _heineken,
     "teamtailor":      _teamtailor,
+    "oracle":          _oracle,
 }
 
 
