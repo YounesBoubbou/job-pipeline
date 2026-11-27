@@ -65,6 +65,17 @@ the other systems are added here one at a time as he picks them.
 - [x] **C-3. Fill and fetch the 14 Teamtailor rows** (C3, B1 to B4). `source`/`token` from
   `ats_evidence`/`careers_url`, one fetch each, status by ADR-0006; then a live fetch of
   three real boards returning Dutch jobs, and a full run under 30 minutes (T1).
+- [x] **C-4. Oracle Recruiting ADR** (C2, Q4). Younes chose Oracle Recruiting second
+  (2026-11-27). `docs/adr/0016-oracle-recruiting-reader.md`: the four checks, done live.
+- [ ] **C-5. Oracle Recruiting reader** (C3). `_oracle` in `FETCHERS` and
+  `_oracle_description` in `DESCRIPTION_FETCHERS` of `scrapers/targets.py`, as ADR-0016
+  says. Tests with fake responses: listing over two pages, secondary locations joined,
+  "; Netherlands" appended, description joined, empty board, failing board, failing
+  description.
+- [ ] **C-6. Fill and fetch the 14 Oracle rows** (C3, B1 to B4). `source`/`token` from
+  `ats_evidence`/`careers_url` (Oracle: `CX_45001` on `eeho.fa.us2.oraclecloud.com`;
+  Akamai: find its site, else leave `none`), one fetch each, status by ADR-0006; then a live
+  fetch of three real boards returning Dutch jobs, and a full run under 30 minutes (T1).
 
 ## Phase D: what is left
 
