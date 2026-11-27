@@ -4,10 +4,11 @@ scrapers/targets.py — Fetch openings for every company in targets.csv (ADR-000
 Each row names a company, its ATS vendor (`source`) and its board token. Every vendor
 here has a public JSON API (GetNoticed's descriptions come from its RSS feed), except
 Heineken's own site, whose job list is read from HTML (ADR-0010), Teamtailor, read from
-each careers site's public RSS feed (ADR-0015), and Oracle Recruiting, read from the JSON
-endpoint its careers sites call (ADR-0016). Boards that fail are reported at the end of
-the run rather than skipped silently, since a failure usually means the company moved to
-another ATS and the row needs updating.
+each careers site's public RSS feed (ADR-0015), Oracle Recruiting, read from the JSON
+endpoint its careers sites call (ADR-0016), and SAP SuccessFactors, whose job pages are
+listed in each careers site's sitemap and read one by one (ADR-0017). Boards that fail are
+reported at the end of the run rather than skipped silently, since a failure usually means
+the company moved to another ATS and the row needs updating.
 """
 
 import csv
@@ -16,7 +17,7 @@ import re
 import time
 import xml.etree.ElementTree as ET
 from datetime import datetime
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, unquote, urlsplit
 
 import requests
 from bs4 import BeautifulSoup
@@ -331,6 +332,115 @@ def _oracle(token):
             break
 
 
+SF_SMALL_SITE = 150  # a sitemap with more job addresses than this is pre-filtered by slug
+SF_ADDRESS_FIELDS = ("streetAddress", "addressLocality", "addressRegion", "postalCode", "addressCountry")
+
+
+def _successfactors(token):
+    # Token is the careers site, e.g. https://careers.triodos.com. Its sitemap lists every job
+    # page; the listing itself can't be asked by country through paths robots.txt allows, so
+    # each job page is read, one after another. On big sites only pages whose address looks
+    # Dutch are read (ADR-0017). The description comes with the page, so no
+    # DESCRIPTION_FETCHERS entry.
+    r = requests.get(f"{token.rstrip('/')}/sitemap.xml", headers=HEADERS, timeout=TIMEOUT)
+    r.raise_for_status()
+    # The XML parser unescapes &amp; and &apos; in the addresses.
+    urls = [e.text.strip() for e in ET.fromstring(r.content).iter()
+            if e.tag.endswith("loc") and e.text and "/job/" in e.text]
+    if len(urls) > SF_SMALL_SITE:
+        urls = [u for u in urls if _sf_slug_looks_dutch(u)]
+    for url in urls:
+        try:
+            page = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+            page.raise_for_status()
+        except Exception:
+            continue  # one bad page doesn't fail the board
+        if "/job/" not in page.url:
+            continue  # expired jobs redirect away from the job page
+        job = _sf_read_page(page.text, url)
+        if job:
+            yield job
+
+
+def _sf_slug(url):
+    # /job/Rotterdam-Product-Owner-Data-Platforms-ZH-3072-AP/1367862157/ ->
+    # "Rotterdam Product Owner Data Platforms ZH 3072 AP"
+    path = urlsplit(url).path.rstrip("/")
+    slug = path.split("/job/", 1)[-1].rsplit("/", 1)[0]
+    return " ".join(unquote(slug).replace("-", " ").replace("/", " ").split())
+
+
+def _sf_slug_looks_dutch(url):
+    # False matches are harmless: the page's own location decides later.
+    slug = _sf_slug(url)
+    return (names_nl_place(slug)
+            or re.search(r"\b(nld|netherlands|nederland)\b", slug, re.I) is not None
+            or re.search(r"\d{4}-[A-Z]{2}/\d+/?$", urlsplit(url).path) is not None)
+
+
+def _sf_token_value(token, html=False):
+    # A .joblayouttoken holds a label ("Job Location (Short):") and its value; the value is
+    # the token without the label, as text or (for a description) as HTML.
+    label = token.select_one(".joblayouttoken-label")
+    if label is not None:
+        label.extract()
+    return token.decode_contents().strip() if html else token.get_text(" ", strip=True)
+
+
+def _sf_read_page(text, url):
+    soup = BeautifulSoup(text, "html.parser")
+    title_el = soup.find(attrs={"itemprop": "title"})
+    title = (title_el.get("content") or title_el.get_text(" ", strip=True)) if title_el else ""
+    if not title:
+        # NTT DATA and Seagate have no itemprop; their og:title is the bare job title.
+        og = soup.find("meta", attrs={"property": "og:title"})
+        title = (og.get("content") or "").strip() if og else ""
+    if not title:
+        return None
+
+    tokens = {}  # label (lowercase) -> the first token with that label
+    for t in soup.select(".joblayouttoken"):
+        label = t.select_one(".joblayouttoken-label")
+        if label is not None:
+            tokens.setdefault(label.get_text(" ", strip=True).lower(), t)
+
+    def token_with(word, html=False):
+        for label, t in tokens.items():
+            if word in label:
+                return _sf_token_value(t, html)
+        return ""
+
+    # Location: schema.org address fields, else a labelled token, else the address's slug.
+    parts = []
+    for field in SF_ADDRESS_FIELDS:
+        for el in soup.find_all(attrs={"itemprop": field}):
+            value = (el.get("content") or el.get_text(" ", strip=True)).strip()
+            if value:
+                parts.append(value)
+    location = ", ".join(parts)
+    if not location:
+        place, country = token_with("location"), token_with("country")
+        location = ", ".join(p for p in dict.fromkeys((place, country)) if p)
+    if not location:
+        location = _sf_slug(url)
+    # "LA Driebergen-Rijsenburg, NLD" names no town the filters know, but is in the Netherlands.
+    if re.search(r"\b(NLD|NL)\b", location) and not names_nl_place(location):
+        location += ", Netherlands"
+
+    # Description: some sites split it over several itemprop elements, some of them empty.
+    parts = [el.decode_contents().strip() for el in soup.find_all(attrs={"itemprop": "description"})]
+    description = " ".join(p for p in parts if p) or token_with("description", html=True)
+    if not description:
+        # Port of Rotterdam has its text only in the job panel as a whole.
+        # The panel also holds <script> and <style> blocks, whose code isn't description.
+        panel = soup.select_one(".jobDisplay")
+        if panel is not None:
+            for el in panel.find_all(["script", "style"]):
+                el.decompose()
+        description = panel.decode_contents().strip() if panel else ""
+    return title, location, url, description
+
+
 # HSBC and DSM-Firmenich (Eightfold), AkzoNobel (Phenom) and Heineken (its own site) are
 # asked for Netherlands jobs only too (ADR-0010).
 
@@ -543,6 +653,7 @@ FETCHERS = {
     "heineken":        _heineken,
     "teamtailor":      _teamtailor,
     "oracle":          _oracle,
+    "successfactors":  _successfactors,
 }
 
 

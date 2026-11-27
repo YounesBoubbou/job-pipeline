@@ -78,7 +78,7 @@ the other systems are added here one at a time as he picks them.
   fetch of three real boards returning Dutch jobs, and a full run under 30 minutes (T1).
 - [x] **C-7. SAP SuccessFactors ADR** (C2, Q4). Younes chose SuccessFactors third and the
   hybrid way of reading it (2026-11-27). `docs/adr/0017-successfactors-reader.md`.
-- [ ] **C-8. SAP SuccessFactors reader** (C3). `_successfactors` in `FETCHERS` of
+- [x] **C-8. SAP SuccessFactors reader** (C3). `_successfactors` in `FETCHERS` of
   `scrapers/targets.py`, as ADR-0017 says. Tests with fake responses: small site reads
   every page; big site reads only slug matches (town, `NLD`, postcode); location from
   address fields, from a labelled token, from the slug; `NLD` gets ", Netherlands";

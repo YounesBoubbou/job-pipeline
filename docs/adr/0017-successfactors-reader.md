@@ -44,6 +44,10 @@ Deloitte, is a Workday row and is not part of this). Two kinds of site:
    - description: `itemprop="description"` on most; elsewhere on Triodos, Port of
      Rotterdam, Canon, Seagate (a "Job Description:" token).
 
+Amended the same day after the C-8 live check: the title, `streetAddress` and description
+fallbacks in the Decision were added for NTT DATA, Seagate, TU Delft, Triodos and Port of
+Rotterdam.
+
 Checks 1, 2 and 4 pass; 3 fails, which costs one request per job page read. Younes accepted
 that with the hybrid below.
 
@@ -59,15 +63,22 @@ that with the hybrid below.
     in a Dutch postcode (`\d{4}-[A-Z]{2}` just before the id). False matches are harmless:
     the page's own location decides.
 - **Fields from each page.**
-  - title = text of `itemprop="title"`; a page without it is skipped (expired jobs redirect
-    to pages without one).
-  - location, first that is found: the schema.org address fields (`addressLocality`,
-    `addressRegion`, `postalCode`, `addressCountry`) joined by `", "`; else the value of the
+  - A page whose final address (after redirects) has no `/job/` in it is skipped: expired
+    jobs redirect away from the job page.
+  - title = text of `itemprop="title"`; else the `content` of `<meta property="og:title">`
+    (NTT DATA and Seagate have no `itemprop`; their `og:title` is the bare job title, as on
+    every site checked). A page with neither is skipped.
+  - location, first that is found: the schema.org address fields (`streetAddress`, which
+    TU Delft, Volvo and Athlon fill with the whole "Delft, NL, 2628 CD", then
+    `addressLocality`, `addressRegion`, `postalCode`, `addressCountry`) joined by `", "`; else the value of the
     first `.joblayouttoken` whose label contains "location" (any case), plus one whose label
     contains "country"; else the slug's text. If the result contains the code `NLD` or
     `NL` as a separate word and names no NL place, `", Netherlands"` is appended.
-  - description = HTML of `itemprop="description"`; else the value of a `.joblayouttoken`
-    whose label contains "description"; else "".
+  - description = HTML of every non-empty `itemprop="description"` element, joined
+    (Triodos has three, the first empty; Worldline splits its text over three); else the
+    value of a `.joblayouttoken` whose label contains "description"; else the HTML of the
+    `.jobDisplay` block (the whole job panel; Port of Rotterdam has nothing else) with its
+    `<script>` and `<style>` blocks removed; else "".
   - url = the sitemap address (not the redirect target).
   So the reader returns description already filled; no `DESCRIPTION_FETCHERS` entry.
 - **Politeness.** Requests one after another (no parallelism), with the shared `HEADERS`
