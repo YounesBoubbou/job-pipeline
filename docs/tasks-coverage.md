@@ -72,7 +72,7 @@ the other systems are added here one at a time as he picks them.
   says. Tests with fake responses: listing over two pages, secondary locations joined,
   "; Netherlands" appended, description joined, empty board, failing board, failing
   description.
-- [ ] **C-6. Fill and fetch the 14 Oracle rows** (C3, B1 to B4). `source`/`token` from
+- [x] **C-6. Fill and fetch the 14 Oracle rows** (C3, B1 to B4). `source`/`token` from
   `ats_evidence`/`careers_url` (Oracle: `CX_45001` on `eeho.fa.us2.oraclecloud.com`;
   Akamai: find its site, else leave `none`), one fetch each, status by ADR-0006; then a live
   fetch of three real boards returning Dutch jobs, and a full run under 30 minutes (T1).
